@@ -1,5 +1,6 @@
 package com.ll.gramgram.boundedContext.likeablePerson.service;
 
+import com.ll.gramgram.DataNotFoundException;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -47,5 +49,19 @@ public class LikeablePersonService {
 
     public List<LikeablePerson> findByFromInstaMemberId(Long fromInstaMemberId) {
         return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
+    }
+
+    public LikeablePerson getLikeablePerson(Integer id) {
+        Optional<LikeablePerson> likeablePerson = likeablePersonRepository.findById(id);
+        if (likeablePerson.isPresent()) {
+            return likeablePerson.get();
+        } else {
+            throw new DataNotFoundException("likeablePerson not found");
+        }
+    }
+
+    @Transactional
+    public void delete(LikeablePerson likeablePerson) { //호감 받은 사람 삭제하기
+        likeablePersonRepository.delete(likeablePerson);
     }
 }
