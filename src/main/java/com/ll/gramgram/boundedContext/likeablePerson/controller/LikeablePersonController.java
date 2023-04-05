@@ -66,7 +66,7 @@ public class LikeablePersonController {
     @GetMapping("/delete/{id}")
     public String delete(@PathVariable("id") int id){
         LikeablePerson likeablePerson = likeablePersonService.getLikeablePerson(id); //호감을 받은 사람 객체 구하기
-        if (likeablePerson.getFromInstaMember().getId() != rq.getMember().getInstaMember().getId()) { //"호감을 표시한 멤버의 아이디"와 "현재 로그인한 회원의 인스타 아이디"가 같은지 확인하기
+        if (likeablePerson.getFromInstaMember().getId() != rq.getMember().getInstaMember().getId()) { //"호감을 표시한 멤버의 인스타 아이디"와 "현재 로그인한 회원의 인스타 아이디"가 같은지 확인하기
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
         }
         likeablePersonService.delete(likeablePerson);

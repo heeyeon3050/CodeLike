@@ -17,6 +17,13 @@ spring:
             authorization-grant-type: authorization_code
             redirect-uri: http://localhost:8080/login/oauth2/code/kakao
             client-authentication-method: POST
+          google:
+            clientId: 212571681532-o2gmeo2uqjm9kbm9f0ggsgoriahqljpd.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
+              - profile
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
