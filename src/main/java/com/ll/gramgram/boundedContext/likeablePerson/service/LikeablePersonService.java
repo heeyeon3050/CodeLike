@@ -51,17 +51,15 @@ public class LikeablePersonService {
         return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
     }
 
-    public LikeablePerson getLikeablePerson(Integer id) {
-        Optional<LikeablePerson> likeablePerson = likeablePersonRepository.findById(id);
-        if (likeablePerson.isPresent()) {
-            return likeablePerson.get();
-        } else {
-            throw new DataNotFoundException("likeablePerson not found");
-        }
+    public Optional<LikeablePerson> findById(Long id) {
+        return likeablePersonRepository.findById(id);
     }
 
     @Transactional
-    public void delete(LikeablePerson likeablePerson) { //호감 받은 사람 삭제하기
+    public RsData delete(LikeablePerson likeablePerson) {
+        String toInstaMemberUsername = likeablePerson.getToInstaMember().getUsername();
         likeablePersonRepository.delete(likeablePerson);
+
+        return RsData.of("S-1", "%s님에 대한 호감을 취소하였습니다.".formatted(toInstaMemberUsername));
     }
 }
