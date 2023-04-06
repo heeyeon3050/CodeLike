@@ -73,10 +73,9 @@ public class LikeablePersonController {
     public String delete(@PathVariable("id") Long id){
         LikeablePerson likeablePerson = likeablePersonService.findById(id).orElse(null);
 
-        if (likeablePerson == null) return rq.historyBack("이미 취소된 호감입니다.");
+        RsData canActorDeleteRsData = likeablePersonService.canActorDelete(rq.getMember(), likeablePerson);
 
-        if (!Objects.equals(rq.getMember().getInstaMember().getId(), likeablePerson.getFromInstaMember().getId()))
-            return rq.historyBack("권한이 없습니다.");
+        if (canActorDeleteRsData.isFail()) return rq.historyBack(canActorDeleteRsData);
 
         RsData deleteRs = likeablePersonService.delete(likeablePerson);
 
