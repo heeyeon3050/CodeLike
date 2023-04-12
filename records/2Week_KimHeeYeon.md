@@ -29,3 +29,42 @@
 - [x]  인스타 아이디가 같아도 다른 유형의 호감표시는 가능한 테스트 코드 작성
 - [x]  현재 회원이 호감표시한 사람의 인스타 아이디와 등록하려는 인스타 아이디가 같은데 같은 유형의 호감표시라면 추가 불가능
 - [x]  현재 회원이 호감표시한 사람의 인스타 아이디와 등록하려는 인스타 아이디가 같아도 다른 유형의 호감표시라면 호감표시 유형을 수정
+
+### **2주차 미션 요약**
+
+---
+
+### **[접근 방법]**
+
+### 필수 미션
+
+**케이스 4**
+
+- `likeablePersonService`에서 `like() 메소드` 활용
+- 현재 로그인한 회원이 호감표시한 사람들 중에서
+  `인스타 아이디`가 `추가하려는 인스타 아이디`와 같을 경우 중복으로 호감표시 할 수 없음
+- `member.getInstaMember().getFromLikeablePeople()` 에 대해 반복문을 사용하여 체크
+
+**케이스 5**
+
+- `likeablePersonService`에서 `like() 메소드`활용
+- FromLikeablePeople은 List이므로 size()를 이용하여 10명 이상인지 체크
+    - `member.getInstaMember().getFromLikeablePeople().size() > 10` 일 경우, 예외 처리를 하도록 진행하였으나 11명 까지 등록이 되었음
+    - 현재 `FromLikeablePeople` 의 크기에 중점을 두고 생각했어야 했음
+      (내가 등록하려는 likeablePerson은 아직 등록되지 않음)
+    - `member.getInstaMember().getFromLikeablePeople().size() >= 10` 으로 구현해야 함
+
+**케이스 6**
+
+- `likeablePersonService`에서 `like() 메소드` 활용
+- 케이스 4에서 추가적으로 생각
+- 현재 로그인한 회원이 호감표시한 사람들 중에서
+  `인스타 아이디`가 `추가하려는 인스타 아이디`와 같을 경우 `호감표시 유형`도 같은지 체크
+    - `if(lp.getAttractiveTypeCode() == attractiveTypeCode)`
+
+      → 같을 경우, 중복으로 호감 표시할 수 없음
+
+      → 다를 경우, 호감표시 유형만 수정
+
+- 호감표시 유형을 수정한 후, 코드가 아닌 이름을 출력하도록 해야 함
+    - `AttractiveTypeDisplayName()`을 사용
