@@ -33,6 +33,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String providerTypeCode = userRequest.getClientRegistration().getRegistrationId().toUpperCase();
 
+        if (providerTypeCode.equals("NAVER")) { // NAVER일 경우, MAP을 이용하여 id값만 가져옴
+            Map<String, Object> response = (Map<String, Object>) oAuth2User.getAttributes().get("response");
+            oauthId = (String) response.get("id");
+        }
+
         String username = providerTypeCode + "__%s".formatted(oauthId);
 
         Member member = memberService.whenSocialLogin(providerTypeCode, username).getData();
