@@ -38,7 +38,7 @@
 
 ### 선택 미션
 
-네이버 로그인 연동
+**네이버 로그인 연동**
 
 - [x] 네이버 로그인으로 가입 및 로그인 처리가 가능해야 한다. (스프링 OAuth2 클라이언트 구현)
 - [x] 네이버 로그인으로 가입한 회원의 providerTypeCode : NAVER 
@@ -82,3 +82,15 @@
 
 - 호감표시 유형을 수정한 후, 코드가 아닌 이름을 출력하도록 해야 함
     - `AttractiveTypeDisplayName()`을 사용
+
+### 선택 미션
+
+**네이버 로그인 연동**
+- `네이버 developer` 가입 후 진행
+- 카카오, 구글 로그인과 같은 방식으로 `application.yml`을 수정
+- 네이버는 카카오, 구글과 다르게 NAVER__{id=?, nickname=?, email=?}과 같은 형식으로 출력되어서 id만 추출
+    - 구글 검색을 통해 Map을 이용하여 id만 추출
+
+### **[특이 사항]**
+- 네이버 로그인 연동 시, id만 추출하기 위해 `(Map<String, Object>) oAuth2User.getAttributes().get("response");`를 사용하였는데,
+    `getAttributes()`가 리턴하는 값은 `null`인데 왜 넣어주는지 궁금하다.
