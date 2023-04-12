@@ -32,6 +32,12 @@ public class LikeablePersonService {
             return RsData.of("F-1", "본인을 호감상대로 등록할 수 없습니다.");
         }
 
+        for (LikeablePerson lp : member.getInstaMember().getFromLikeablePeople()) {
+            if(lp.getToInstaMember().getUsername().equals(username)){
+                return RsData.of("F-3", "인스타유저(%s)는 이미 등록되어있습니다.".formatted(username));
+            }
+        }
+
         InstaMember fromInstaMember = member.getInstaMember();
         InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
 
