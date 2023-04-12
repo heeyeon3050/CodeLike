@@ -36,8 +36,9 @@ public class LikeablePersonService {
             if(lp.getToInstaMember().getUsername().equals(username)){
                 if(lp.getAttractiveTypeCode() == attractiveTypeCode)
                     return RsData.of("F-3", "인스타유저(%s)는 이미 등록되어있습니다.".formatted(username));
-                modify(lp, attractiveTypeCode);
-                return RsData.of("S-2", "인스타유저(%s)에 대한 호감사유가 변경되었습니다.".formatted(username));
+                String oldAttractiveTypeDisplayName = lp.getAttractiveTypeDisplayName();
+                String newAttractiveTypeDisplayName = modify(lp, attractiveTypeCode);
+                return RsData.of("S-2", "인스타유저(%s)에 대한 호감사유가 %s에서 %s(으)로 변경되었습니다.".formatted(username, oldAttractiveTypeDisplayName, newAttractiveTypeDisplayName));
             }
         }
 
@@ -77,9 +78,10 @@ public class LikeablePersonService {
     }
 
     @Transactional
-    public void modify(LikeablePerson likeablePerson, int attractiveTypeCode) {
+    public String modify(LikeablePerson likeablePerson, int attractiveTypeCode) {
         likeablePerson.setAttractiveTypeCode(attractiveTypeCode);
         likeablePersonRepository.save(likeablePerson);
+        return likeablePerson.getAttractiveTypeDisplayName();
     }
 
     @Transactional
