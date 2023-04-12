@@ -267,4 +267,26 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().methodName("add"))
                 .andExpect(status().is4xxClientError());
     }
+
+    @Test
+    @DisplayName("인스타 아이디가 같아도 다른 유형의 호감표시는 가능하다.")
+    @WithUserDetails("user3")
+    void t011() throws Exception{
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user4")
+                        .param("attractiveTypeCode", "2")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is3xxRedirection());
+
+        assertThat(likeablePersonService.findById(1L).get().getAttractiveTypeCode()).isEqualTo(2);
+    }
 }
