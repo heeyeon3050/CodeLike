@@ -1,7 +1,9 @@
 package com.ll.gramgram.boundedContext.likeablePerson.controller;
 
 
+import com.ll.gramgram.base.rq.Rq;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
+import com.ll.gramgram.boundedContext.member.entity.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,8 @@ public class LikeablePersonControllerTests {
     private MockMvc mvc;
     @Autowired
     private LikeablePersonService likeablePersonService;
+    @Autowired
+    private Rq rq;
 
     @Test
     @DisplayName("등록 폼(인스타 인증을 안해서 폼 대신 메세지)")
@@ -228,6 +232,31 @@ public class LikeablePersonControllerTests {
                 .perform(post("/likeablePerson/add")
                         .with(csrf()) // CSRF 키 생성
                         .param("username", "insta_user4")
+                        .param("attractiveTypeCode", "1")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @DisplayName("한 명의 instaMember가 11명 이상의 호감상대를 등록할 수 없다.")
+    @WithUserDetails("user3")
+    void t010() throws Exception{
+        Member member = rq.getMember();
+        for (int i = 5; i < 13; i ++){
+            likeablePersonService.like(member, "insta_user"+i, 1);
+        }
+
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")  //11번째 추가
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user13")
                         .param("attractiveTypeCode", "1")
                 )
                 .andDo(print());
