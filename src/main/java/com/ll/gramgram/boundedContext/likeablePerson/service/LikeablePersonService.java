@@ -36,15 +36,14 @@ public class LikeablePersonService {
         InstaMember fromInstaMember = member.getInstaMember();
         InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
 
+        //현재 로그인한 회원이 생성한 '좋아요'들 가져오기
         List<LikeablePerson> fromLikeablePeople = fromInstaMember.getFromLikeablePeople();
 
         for (LikeablePerson lp : fromLikeablePeople) {
             if(lp.getToInstaMember().getUsername().equals(username)){
                 if(lp.getAttractiveTypeCode() == attractiveTypeCode)
                     return RsData.of("F-3", "인스타유저(%s)는 이미 등록되어있습니다.".formatted(username));
-                String oldAttractiveTypeDisplayName = lp.getAttractiveTypeDisplayName();
-                String newAttractiveTypeDisplayName = modify(lp, attractiveTypeCode);
-                return RsData.of("S-2", "인스타유저(%s)에 대한 호감사유가 %s에서 %s(으)로 변경되었습니다.".formatted(username, oldAttractiveTypeDisplayName, newAttractiveTypeDisplayName));
+                modifyAttractiveTypeCode(lp, username, attractiveTypeCode); //호감유형 수정
             }
         }
 
@@ -83,10 +82,12 @@ public class LikeablePersonService {
     }
 
     @Transactional
-    public String modify(LikeablePerson likeablePerson, int attractiveTypeCode) {
+    public RsData modifyAttractiveTypeCode(LikeablePerson likeablePerson, String username, int attractiveTypeCode) {
+        String oldAttractiveTypeDisplayName = likeablePerson.getAttractiveTypeDisplayName(); //현재 호감유형을 이름으로 가져오기
         likeablePerson.setAttractiveTypeCode(attractiveTypeCode);
         likeablePersonRepository.save(likeablePerson);
-        return likeablePerson.getAttractiveTypeDisplayName();
+        String newAttractiveTypeDisplayName = likeablePerson.getAttractiveTypeDisplayName(); //수정된 호감유형을 이름으로 가져오기
+        return RsData.of("S-2", "인스타유저(%s)에 대한 호감사유가 %s에서 %s(으)로 변경되었습니다.".formatted(username, oldAttractiveTypeDisplayName, newAttractiveTypeDisplayName));
     }
 
     @Transactional
