@@ -33,7 +33,12 @@ public class LikeablePersonService {
             return RsData.of("F-1", "본인을 호감상대로 등록할 수 없습니다.");
         }
 
-        for (LikeablePerson lp : member.getInstaMember().getFromLikeablePeople()) {
+        InstaMember fromInstaMember = member.getInstaMember();
+        InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
+
+        List<LikeablePerson> fromLikeablePeople = fromInstaMember.getFromLikeablePeople();
+
+        for (LikeablePerson lp : fromLikeablePeople) {
             if(lp.getToInstaMember().getUsername().equals(username)){
                 if(lp.getAttractiveTypeCode() == attractiveTypeCode)
                     return RsData.of("F-3", "인스타유저(%s)는 이미 등록되어있습니다.".formatted(username));
@@ -45,12 +50,9 @@ public class LikeablePersonService {
 
         long likeablePersonFromMax = AppConfig.getLikeablePersonFromMax();
 
-        if(member.getInstaMember().getFromLikeablePeople().size() >= likeablePersonFromMax){
-            return RsData.of("F-4", "호감표시는 %d명까지 등록가능합니다.".formatted(likeablePersonFromMax));
+        if(fromLikeablePeople.size() >= likeablePersonFromMax){
+            return RsData.of("F-4", "호감표시는 최대 %d명까지 등록가능합니다.".formatted(likeablePersonFromMax));
         }
-
-        InstaMember fromInstaMember = member.getInstaMember();
-        InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
 
         LikeablePerson likeablePerson = LikeablePerson
                 .builder()
