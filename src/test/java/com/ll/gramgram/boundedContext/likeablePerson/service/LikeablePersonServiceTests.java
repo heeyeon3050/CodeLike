@@ -1,5 +1,6 @@
 package com.ll.gramgram.boundedContext.likeablePerson.service;
 
+import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.member.entity.Member;
@@ -60,6 +61,14 @@ public class LikeablePersonServiceTests {
 
         assertThat(likeRsData.getResultCode()).isEqualTo("S-2");
         assertThat(likeRsData.getMsg()).isEqualTo( "인스타유저(insta_user4)에 대한 호감사유가 외모에서 성격(으)로 변경되었습니다.");
+    }
+
+    @Test
+    @DisplayName("설정파일에 있는 최대가능호감표시 수 가져오기")
+    void t004() throws Exception {
+        long likeablePersonFromMax = AppConfig.getLikeablePersonFromMax();
+
+        assertThat(likeablePersonFromMax).isEqualTo(10);
     }
 }
 

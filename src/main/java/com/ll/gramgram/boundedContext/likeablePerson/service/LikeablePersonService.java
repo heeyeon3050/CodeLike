@@ -1,6 +1,7 @@
 package com.ll.gramgram.boundedContext.likeablePerson.service;
 
 import com.ll.gramgram.DataNotFoundException;
+import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
@@ -42,8 +43,10 @@ public class LikeablePersonService {
             }
         }
 
-        if(member.getInstaMember().getFromLikeablePeople().size() >= 10){
-            return RsData.of("F-4", "호감표시는 10명까지 등록가능합니다.");
+        long likeablePersonFromMax = AppConfig.getLikeablePersonFromMax();
+
+        if(member.getInstaMember().getFromLikeablePeople().size() >= likeablePersonFromMax){
+            return RsData.of("F-4", "호감표시는 %d명까지 등록가능합니다.".formatted(likeablePersonFromMax));
         }
 
         InstaMember fromInstaMember = member.getInstaMember();

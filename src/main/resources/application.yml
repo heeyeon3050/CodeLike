@@ -55,3 +55,8 @@ logging:
     com.ll.gramgram_ai: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
     org.hibernate.orm.jdbc.extract: TRACE
+custom: #custom이름은 개인적으로 지은 것.
+  likeablePerson:
+    from:
+      max: 10
+
