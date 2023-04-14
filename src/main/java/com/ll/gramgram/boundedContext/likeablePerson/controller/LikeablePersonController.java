@@ -15,7 +15,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Controller
 @RequestMapping("/likeablePerson")
@@ -44,13 +43,19 @@ public class LikeablePersonController {
 
         if (canLikeRsData.isFail()) return rq.historyBack(canLikeRsData);
 
-        RsData<LikeablePerson> createRsData = likeablePersonService.like(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
+        RsData rsData;
 
-        if (createRsData.isFail()) {
-            return rq.historyBack(createRsData);
+        if (canLikeRsData.getResultCode().equals("S-2")) {
+            rsData = likeablePersonService.modifyAttractive(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
+        } else {
+            rsData = likeablePersonService.like(rq.getMember(), addForm.getUsername(), addForm.getAttractiveTypeCode());
         }
 
-        return rq.redirectWithMsg("/likeablePerson/list", createRsData);
+        if (rsData.isFail()) {
+            return rq.historyBack(rsData);
+        }
+
+        return rq.redirectWithMsg("/likeablePerson/list", rsData);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -70,17 +75,17 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") Long id){
+    public String delete(@PathVariable Long id) {
         LikeablePerson likeablePerson = likeablePersonService.findById(id).orElse(null);
 
         RsData canActorDeleteRsData = likeablePersonService.canDelete(rq.getMember(), likeablePerson);
 
         if (canActorDeleteRsData.isFail()) return rq.historyBack(canActorDeleteRsData);
 
-        RsData deleteRs = likeablePersonService.delete(likeablePerson);
+        RsData deleteRsData = likeablePersonService.delete(likeablePerson);
 
-        if (deleteRs.isFail()) return rq.historyBack(deleteRs);
+        if (deleteRsData.isFail()) return rq.historyBack(deleteRsData);
 
-        return rq.redirectWithMsg("/likeablePerson/list", deleteRs);
+        return rq.redirectWithMsg("/likeablePerson/list", deleteRsData);
     }
 }
