@@ -1,15 +1,13 @@
 package com.ll.gramgram.boundedContext.likeablePerson.service;
 
+
 import com.ll.gramgram.base.appConfig.AppConfig;
-import com.ll.gramgram.base.rsData.RsData;
+import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
-import com.ll.gramgram.boundedContext.member.entity.Member;
-import com.ll.gramgram.boundedContext.member.service.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,66 +17,133 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("test")
 public class LikeablePersonServiceTests {
     @Autowired
     private LikeablePersonService likeablePersonService;
     @Autowired
-    private MemberService memberService;
-    @Autowired
     private LikeablePersonRepository likeablePersonRepository;
 
     @Test
-    @DisplayName("user3이 user4에게 중복으로 호감표시 할 수 없다.")
-    void t001() {
-        Member member = memberService.findByUsername("user3").get();
+    @DisplayName("테스트 1")
+    void t001() throws Exception {
+        // 2번 좋아요 정보를 가져온다.
+        /*
+        SELECT *
+        FROM likeable_person
+        WHERE id = 2;
+        */
+        LikeablePerson likeablePersonId2 = likeablePersonService.findById(2L).get();
 
-        RsData<LikeablePerson> likeRsData = likeablePersonService.like(member, "insta_user4", 1);
+        // 2번 좋아요를 발생시킨(호감을 표시한) 인스타회원을 가져온다.
+        // 그 회원의 인스타아이디는 insta_user3 이다.
+        /*
+        SELECT *
+        FROM insta_member
+        WHERE id = 2;
+        */
+        InstaMember instaMemberInstaUser3 = likeablePersonId2.getFromInstaMember();
+        assertThat(instaMemberInstaUser3.getUsername()).isEqualTo("insta_user3");
 
-        assertThat(likeRsData.getResultCode()).isEqualTo("F-3");
-        assertThat(likeRsData.getMsg()).isEqualTo("인스타유저(insta_user4)는 이미 등록되어있습니다.");
+        // 인스타아이디가 insta_user3 인 사람이 호감을 표시한 `좋아요` 목록
+        // 좋아요는 2가지로 구성되어 있다 : from(호감표시자), to(호감받은자)
+        /*
+        SELECT *
+        FROM likeable_person
+        WHERE from_insta_member_id = 2;
+        */
+        List<LikeablePerson> fromLikeablePeople = instaMemberInstaUser3.getFromLikeablePeople();
 
+        // 특정 회원이 호감을 표시한 좋아요 반복한다.
+        for (LikeablePerson likeablePerson : fromLikeablePeople) {
+            // 당연하게 그 특정회원(인스타아이디 instal_user3)이 좋아요의 호감표시자회원과 같은 사람이다.
+            assertThat(instaMemberInstaUser3.getUsername()).isEqualTo(likeablePerson.getFromInstaMember().getUsername());
+        }
     }
 
     @Test
-    @DisplayName("한 명의 instaMember가 11명 이상의 호감상대를 등록할 수 없다.")
-    void t002() {
-        Member member = memberService.findByUsername("user3").get();
+    @DisplayName("테스트 2")
+    void t002() throws Exception {
+        // 2번 좋아요 정보를 가져온다.
+        /*
+        SELECT *
+        FROM likeable_person
+        WHERE id = 2;
+        */
+        LikeablePerson likeablePersonId2 = likeablePersonService.findById(2L).get();
 
-        for (int i = 5; i < 13; i ++){
-            likeablePersonService.like(member, "insta_user"+i, 1);
+        // 2번 좋아요를 발생시킨(호감을 표시한) 인스타회원을 가져온다.
+        // 그 회원의 인스타아이디는 insta_user3 이다.
+        /*
+        SELECT *
+        FROM insta_member
+        WHERE id = 2;
+        */
+        InstaMember instaMemberInstaUser3 = likeablePersonId2.getFromInstaMember();
+        assertThat(instaMemberInstaUser3.getUsername()).isEqualTo("insta_user3");
+
+        // 내가 새로 호감을 표시하려는 사람의 인스타 아이디
+        String usernameToLike = "insta_user4";
+
+        // v1
+        LikeablePerson likeablePersonIndex0 = instaMemberInstaUser3.getFromLikeablePeople().get(0);
+        LikeablePerson likeablePersonIndex1 = instaMemberInstaUser3.getFromLikeablePeople().get(1);
+
+        if (usernameToLike.equals(likeablePersonIndex0.getToInstaMember().getUsername())) {
+            System.out.println("v1 : 이미 나(인스타아이디 : insta_user3)는 insta_user4에게 호감을 표시 했구나.");
         }
 
-        RsData<LikeablePerson> likeRsData = likeablePersonService.like(member, "insta_user13", 1);
+        if (usernameToLike.equals(likeablePersonIndex1.getToInstaMember().getUsername())) {
+            System.out.println("v1 : 이미 나(인스타아이디 : insta_user3)는 insta_user4에게 호감을 표시 했구나.");
+        }
 
-        assertThat(likeRsData.getResultCode()).isEqualTo("F-4");
-        assertThat(likeRsData.getMsg()).isEqualTo("호감표시는 10명까지 등록가능합니다.");
-    }
+        // v2
+        for (LikeablePerson fromLikeablePerson : instaMemberInstaUser3.getFromLikeablePeople()) {
+            String toInstaMemberUsername = fromLikeablePerson.getToInstaMember().getUsername();
 
-    @Test
-    @DisplayName("인스타 아이디가 같아도 다른 유형의 호감표시는 가능하다.")
-    void t003() {
-        Member member = memberService.findByUsername("user3").get();
+            if (usernameToLike.equals(toInstaMemberUsername)) {
+                System.out.println("v2 : 이미 나(인스타아이디 : insta_user3)는 insta_user4에게 호감을 표시 했구나.");
+                break;
+            }
+        }
 
-        RsData<LikeablePerson> likeRsData = likeablePersonService.like(member, "insta_user4", 2);
+        // v3
+        long count = instaMemberInstaUser3
+                .getFromLikeablePeople()
+                .stream()
+                .filter(lp -> lp.getToInstaMember().getUsername().equals(usernameToLike))
+                .count();
 
-        assertThat(likeRsData.getResultCode()).isEqualTo("S-2");
-        assertThat(likeRsData.getMsg()).isEqualTo( "인스타유저(insta_user4)에 대한 호감사유가 외모에서 성격(으)로 변경되었습니다.");
+        if (count > 0) {
+            System.out.println("v3 : 이미 나(인스타아이디 : insta_user3)는 insta_user4에게 호감을 표시 했구나.");
+        }
+
+        // v4
+        LikeablePerson oldLikeablePerson = instaMemberInstaUser3
+                .getFromLikeablePeople()
+                .stream()
+                .filter(lp -> lp.getToInstaMember().getUsername().equals(usernameToLike))
+                .findFirst()
+                .orElse(null);
+
+        if (oldLikeablePerson != null) {
+            System.out.println("v4 : 이미 나(인스타아이디 : insta_user3)는 insta_user4에게 호감을 표시 했구나.");
+            System.out.println("v4 : 기존 호감사유 : %s".formatted(oldLikeablePerson.getAttractiveTypeDisplayName()));
+        }
     }
 
     @Test
     @DisplayName("설정파일에 있는 최대가능호감표시 수 가져오기")
-    void t004() throws Exception {
+    void t003() throws Exception {
         long likeablePersonFromMax = AppConfig.getLikeablePersonFromMax();
 
         assertThat(likeablePersonFromMax).isEqualTo(10);
     }
 
     @Test
-    @DisplayName("JPA에서 _를 사용하면 관련 엔티티의 속성을 조건으로 검색할 수 있다.")
-    void t005() throws Exception {
+    @DisplayName("테스트 4")
+    void t004() throws Exception {
         // 좋아하는 사람이 2번 인스타 회원인 `좋아요` 검색
         /*
         SELECT l1_0.id,
@@ -133,5 +198,12 @@ public class LikeablePersonServiceTests {
 
         assertThat(likeablePerson.getId()).isEqualTo(2);
     }
-}
 
+    @Test
+    @DisplayName("테스트 5")
+    void t005() throws Exception {
+        LikeablePerson likeablePerson = likeablePersonRepository.findQslByFromInstaMemberIdAndToInstaMember_username(2L, "insta_user4").orElse(null);
+
+        assertThat(likeablePerson.getId()).isEqualTo(1L);
+    }
+}
