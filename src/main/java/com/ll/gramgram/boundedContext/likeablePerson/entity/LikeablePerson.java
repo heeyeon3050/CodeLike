@@ -1,9 +1,13 @@
 package com.ll.gramgram.boundedContext.likeablePerson.entity;
 
 import com.ll.gramgram.base.baseEntity.BaseEntity;
+import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Entity
@@ -21,18 +25,17 @@ public class LikeablePerson extends BaseEntity {
     @ToString.Exclude
     private InstaMember toInstaMember; // 호감을 받은 사람(인스타 멤버)
     private String toInstaMemberUsername; // 혹시 몰라서 기록
+
     private int attractiveTypeCode; // 매력포인트(1=외모, 2=성격, 3=능력)
 
-    public boolean updateAttractionTypeCode(int attractiveTypeCode) {
+    public RsData updateAttractionTypeCode(int attractiveTypeCode) {
         if (this.attractiveTypeCode == attractiveTypeCode) {
-            return false;
+            return RsData.of("F-1", "이미 설정되었습니다.");
         }
 
-        toInstaMember.decreaseLikesCount(fromInstaMember.getGender(), this.attractiveTypeCode);
-        toInstaMember.increaseLikesCount(fromInstaMember.getGender(), attractiveTypeCode);
-
         this.attractiveTypeCode = attractiveTypeCode;
-        return true;
+
+        return RsData.of("S-1", "성공");
     }
 
     public String getAttractiveTypeDisplayName() {
