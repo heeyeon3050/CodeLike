@@ -57,6 +57,7 @@ logging:
     org.hibernate.orm.jdbc.extract: TRACE
 custom: #custom이름은 개인적으로 지은 것.
   likeablePerson:
+    modifyCoolTime: '#{60 * 60 * 3}'
     from:
       max: 10
 

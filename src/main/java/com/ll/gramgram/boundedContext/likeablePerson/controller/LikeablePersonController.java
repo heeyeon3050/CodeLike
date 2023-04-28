@@ -101,7 +101,7 @@ public class LikeablePersonController {
 
     @AllArgsConstructor
     @Getter
-    public static class ModifyForm {
+    public static class aaa {
         @NotNull
         @Min(1)
         @Max(3)
@@ -110,7 +110,7 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
-    public String modify(@PathVariable Long id, @Valid ModifyForm modifyForm) {
+    public String modify(@PathVariable Long id, @Valid aaa modifyForm) {
         RsData<LikeablePerson> rsData = likeablePersonService.modifyAttractive(rq.getMember(), id, modifyForm.getAttractiveTypeCode());
 
         if (rsData.isFail()) {

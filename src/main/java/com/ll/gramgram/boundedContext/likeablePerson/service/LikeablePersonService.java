@@ -15,6 +15,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -95,6 +97,16 @@ public class LikeablePersonService {
         if (actorInstaMemberId != fromInstaMemberId)
             return RsData.of("F-2", "권한이 없습니다.");
 
+        LocalDateTime modifyDate = likeablePerson.getModifyDate();
+        LocalDateTime currentTime = LocalDateTime.now();
+        long diffInHours = ChronoUnit.HOURS.between(modifyDate, currentTime);
+
+        long time = AppConfig.getChangeableTime();
+
+        if(diffInHours < time) {
+            return RsData.of("F-3", "최근 수정 시간에서 %s시간 이후 수정가능합니다.".formatted(time));
+        }
+
         return RsData.of("S-1", "삭제가능합니다.");
     }
 
@@ -144,6 +156,7 @@ public class LikeablePersonService {
     public RsData<LikeablePerson> modifyAttractive(Member actor, Long id, int attractiveTypeCode) {
         Optional<LikeablePerson> likeablePersonOptional = findById(id);
 
+
         if (likeablePersonOptional.isEmpty()) {
             return RsData.of("F-1", "존재하지 않는 호감표시입니다.");
         }
@@ -152,6 +165,7 @@ public class LikeablePersonService {
 
         return modifyAttractive(actor, likeablePerson, attractiveTypeCode);
     }
+
 
     private RsData<LikeablePerson> modifyAttractive(Member actor, LikeablePerson likeablePerson, int attractiveTypeCode) {
         RsData canModifyRsData = canModifyLike(actor, likeablePerson);
@@ -207,6 +221,15 @@ public class LikeablePersonService {
             return RsData.of("F-2", "해당 호감표시를 취소할 권한이 없습니다.");
         }
 
+        LocalDateTime modifyDate = likeablePerson.getModifyDate();
+        LocalDateTime currentTime = LocalDateTime.now();
+        long diffInHours = ChronoUnit.HOURS.between(modifyDate, currentTime);
+
+        long time = AppConfig.getChangeableTime();
+
+        if(diffInHours < time) {
+            return RsData.of("F-3", "최근 수정 시간에서 %s시간 이후 수정가능합니다.".formatted(time));
+        }
 
         return RsData.of("S-1", "호감표시취소가 가능합니다.");
     }
