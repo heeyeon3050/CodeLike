@@ -1,140 +1,6 @@
 <html data-theme="light" lang="ko">
 
 <head>
-    <meta charSet="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
-    <!-- 제이쿼리 불러오기 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-
-    <!-- toastr 불러오기 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
-    <link rel="stylesheet" href="https://jhs512.github.io/toastr/toastr.css">
-
-    <!-- 폰트어썸 아이콘 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- 아이콘 목록 : https://fontawesome.com/search?o=r&m=free -->
-
-    <!-- 공통 JS 불러오기 -->
-    <script src="/resource/common/common.js"></script>
-    <!-- 공통 CSS 불러오기 -->
-    <link rel="stylesheet" href="/resource/common/common.css">
-
-    <title layout:title-pattern="$CONTENT_TITLE | $LAYOUT_TITLE">그램그램</title>
-</head>
-
-<body>
-
-<!-- 데이지 UI 불러오기 -->
-<link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.5/dist/full.css" rel="stylesheet" type="text/css"/>
-<!-- 테일윈드 불러오기 -->
-<script src="https://cdn.tailwindcss.com"></script>
-
-<!-- min-h-screen : min-height:100vh; -->
-<div className="min-h-screen flex flex-col pb-10">
-    <header className="sticky top-0 z-50">
-        <div className="navbar max-w-2xl mx-auto bg-base-100">
-            <div className="navbar-start">
-                <div className="dropdown">
-                    <label tabIndex="0" className="btn btn-ghost btn-circle">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                             stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M4 6h16M4 12h16M4 18h7"/>
-                        </svg>
-                    </label>
-                    <ul tabIndex="0"
-                        className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
-                        <li th:if="${@rq.logout}"><a href="/usr/member/login"><i
-                                className="fa-solid fa-arrow-right-to-bracket"></i> 로그인</a>
-                        </li>
-                        <li th:if="${@rq.login}">
-                            <a href="javascript:;" onClick="$(this).next().submit();">
-                                <i className="fa-solid fa-arrow-right-from-bracket"></i> 로그아웃
-                            </a>
-                            <form className="!hidden" hidden th:action="|/usr/member/logout|" method="POST"></form>
-                        </li>
-                        <li th:if="${@rq.login}"><a href="/usr/member/me"><i className="fa-solid fa-user"></i> 내 정보</a>
-                        </li>
-                        <li th:if="${@rq.login}"><a href="/usr/likeablePerson/like"><i
-                                className="fa-solid fa-heart-circle-plus"></i> 호감표시</a></li>
-                        <li th:if="${@rq.login}"><a href="/usr/likeablePerson/list"><i
-                                className="fa-solid fa-list-ol"></i>
-                            호감목록</a>
-                        </li>
-                        <li th:if="${@rq.login}" th:unless="${@rq.member.hasConnectedInstaMember}">
-                            <a href="/usr/instaMember/connect">
-                                <i className="fa-brands fa-instagram"></i>
-                                인스타 아이디 입력
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div className="navbar-center">
-                <a href="/" className="btn btn-ghost normal-case text-xl">
-                    <span className="hidden min-[341px]:inline">gramgram</span>
-                    <span className="min-[341px]:hidden">gg</span>
-                </a>
-            </div>
-            <div className="navbar-end">
-                <a href="/usr/member/me" className="btn btn-ghost gap-1" th:if="${@rq.login}">
-                    <i className="fa-solid fa-user"></i>
-                </a>
-                <a href="/usr/noti/list" className="btn btn-ghost btn-circle">
-                    <div className="indicator">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                             stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                        </svg>
-                        <span th:if="${@rq.login}" className="badge badge-xs badge-primary indicator-item"></span>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <main layout:fragment="main"></main>
-</div>
-
-<script th:inline="javascript">
-    // 타임리프 문법(파라미터, ? 뒤에 입력된 매개변수들)
-    const params = /*[[ ${param} ]]*/ null;
-
-    if (params.msg) {
-        toastNotice(params.msg[0]);
-    }
-
-    if (params.errorMsg) {
-        toastWarning(params.errorMsg[0]);
-    }
-
-    // history.back 에 의해서 돌아온 경우에 실행됨
-    // 평소에도 실행됨
-    $(window).bind("pageshow", function (event) {
-        const localStorageKeyAboutHistoryBackErrorMsg = "historyBackErrorMsg___" + location.href;
-
-        if (localStorage.getItem(localStorageKeyAboutHistoryBackErrorMsg)) {
-            toastWarning(localStorage.getItem(localStorageKeyAboutHistoryBackErrorMsg));
-            localStorage.removeItem(localStorageKeyAboutHistoryBackErrorMsg);
-        } else {
-            const localStorageKeyAboutHistoryBackErrorMsg = "historyBackErrorMsg___null";
-
-            if (localStorage.getItem(localStorageKeyAboutHistoryBackErrorMsg)) {
-                toastWarning(localStorage.getItem(localStorageKeyAboutHistoryBackErrorMsg));
-                localStorage.removeItem(localStorageKeyAboutHistoryBackErrorMsg);
-            }
-        }
-    });
-</script>
-
-</body>
-</html><html data-theme="light" lang="ko">
-
-<head>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -182,7 +48,7 @@
                     <ul tabindex="0"
                         class="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52">
                         <li th:if="${@rq.logout}"><a href="/usr/member/login"><i
-                                class="fa-solid fa-arrow-right-to-bracket"></i> 로그인</a>
+                                class="fa-solid fa-arrow-right-to-bracket"></i> 시작하기</a>
                         </li>
                         <li th:if="${@rq.login}">
                             <a href="javascript:;" onclick="$(this).next().submit();">
@@ -201,6 +67,8 @@
                                 <i class="fa-brands fa-instagram"></i>
                                 인스타 아이디 입력
                             </a>
+                        </li>
+                        <li><a href="/usr/home/about"><i class="fa-solid fa-heart"></i> 그램그램이란?</a>
                         </li>
                     </ul>
                 </div>
