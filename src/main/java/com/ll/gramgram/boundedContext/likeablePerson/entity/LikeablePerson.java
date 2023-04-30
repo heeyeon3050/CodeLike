@@ -3,6 +3,7 @@ package com.ll.gramgram.boundedContext.likeablePerson.entity;
 import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.base.baseEntity.BaseEntity;
 import com.ll.gramgram.base.rsData.RsData;
+import com.ll.gramgram.standard.util.Ut;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
@@ -58,6 +59,10 @@ public class LikeablePerson extends BaseEntity {
             case 2 -> "<i class=\"fa-regular fa-face-smile\"></i>";
             default -> "<i class=\"fa-solid fa-people-roof\"></i>";
         } + "&nbsp;" + getAttractiveTypeDisplayName();
+    }
+
+    public String getJdenticon() {
+        return Ut.hash.sha256(fromInstaMember.getId() + "_likes_" + toInstaMember.getId());
     }
 
     public boolean getChangeableTime(){
