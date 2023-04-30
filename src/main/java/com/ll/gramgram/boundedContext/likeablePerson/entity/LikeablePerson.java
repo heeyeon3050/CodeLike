@@ -15,8 +15,6 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-import static com.ll.gramgram.boundedContext.likeablePerson.entity.QLikeablePerson.likeablePerson;
-
 @Entity
 @Getter
 @NoArgsConstructor
@@ -36,6 +34,15 @@ public class LikeablePerson extends BaseEntity {
     private String toInstaMemberUsername; // 혹시 몰라서 기록
 
     private int attractiveTypeCode; // 매력포인트(1=외모, 2=성격, 3=능력)
+
+    public boolean isModifyUnlocked() {
+        return modifyUnlockDate.isBefore(LocalDateTime.now());
+    }
+
+    // 초 단위에서 올림 해주세요.
+    public String getModifyUnlockDateRemainStrHuman() {
+        return "2시간 16분";
+    }
 
     public RsData updateAttractionTypeCode(int attractiveTypeCode) {
         if (this.attractiveTypeCode == attractiveTypeCode) {

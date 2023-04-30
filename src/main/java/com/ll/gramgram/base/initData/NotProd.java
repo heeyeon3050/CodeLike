@@ -1,14 +1,18 @@
 package com.ll.gramgram.base.initData;
 
 import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
+import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import com.ll.gramgram.boundedContext.member.service.MemberService;
-import jakarta.transaction.Transactional;
+import com.ll.gramgram.standard.util.Ut;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Configuration
 @Profile({"dev", "test"})
@@ -30,18 +34,20 @@ public class NotProd {
                 Member memberUser4 = memberService.join("user4", "1234").getData();
                 Member memberUser5 = memberService.join("user5", "1234").getData();
 
-                Member memberUser5ByKakao = memberService.whenSocialLogin("KAKAO", "KAKAO__2737847912").getData();
-                Member memberUser6ByGoogle = memberService.whenSocialLogin("GOOGLE", "GOOGLE__100605279337988090302").getData();
-                Member memberUser6ByNaver = memberService.whenSocialLogin("NAVER", "NAVER__DyT4YEpiw30bexpLU-uIhskMivLcKZlIXdOFLo3lK70").getData();
-
+                Member memberUser6ByKakao = memberService.whenSocialLogin("KAKAO", "KAKAO__2737088692").getData();
+                Member memberUser7ByGoogle = memberService.whenSocialLogin("GOOGLE", "GOOGLE__103240209825008011930").getData();
+                Member memberUser7ByNaver = memberService.whenSocialLogin("NAVER", "NAVER__9xIgV-SJgWqRYtj3IX5zCOzvdQdTY2okeb9iXO2Zip4").getData();
 
                 instaMemberService.connect(memberUser2, "insta_user2", "M");
                 instaMemberService.connect(memberUser3, "insta_user3", "W");
                 instaMemberService.connect(memberUser4, "insta_user4", "M");
                 instaMemberService.connect(memberUser5, "insta_user5", "W");
 
-                likeablePersonService.like(memberUser3, "insta_user4", 1);
-                likeablePersonService.like(memberUser3, "insta_user100", 2);
+                // 원활한 테스트와 개발을 위해서 자동으로 만들어지는 호감이 삭제, 수정이 가능하도록 쿨타임해제
+                LikeablePerson likeablePersonToinstaUser4 = likeablePersonService.like(memberUser3, "insta_user4", 1).getData();
+                Ut.reflection.setFieldValue(likeablePersonToinstaUser4, "modifyUnlockDate", LocalDateTime.now().minusSeconds(1));
+                LikeablePerson likeablePersonToinstaUser100 = likeablePersonService.like(memberUser3, "insta_user100", 2).getData();
+                Ut.reflection.setFieldValue(likeablePersonToinstaUser100, "modifyUnlockDate", LocalDateTime.now().minusSeconds(1));
             }
         };
     }
