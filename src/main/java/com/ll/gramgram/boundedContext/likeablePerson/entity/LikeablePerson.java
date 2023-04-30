@@ -23,6 +23,8 @@ import static com.ll.gramgram.boundedContext.likeablePerson.entity.QLikeablePers
 @SuperBuilder
 @ToString(callSuper = true)
 public class LikeablePerson extends BaseEntity {
+    private LocalDateTime modifyUnlockDate;
+
     @ManyToOne
     @ToString.Exclude
     private InstaMember fromInstaMember; // 호감을 표시한 사람(인스타 멤버)
