@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -16,8 +17,8 @@ import java.util.List;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
 
-    public List<Notification> findByToInstaMember(InstaMember toInstaMember) {
-        return notificationRepository.findByToInstaMember(toInstaMember);
+    public List<Notification> findByToInstaMemberOrderByCreateDateDesc(InstaMember instaMember) {
+        return notificationRepository.findByToInstaMemberOrderByCreateDateDesc(instaMember);
     }
 
     @Transactional
@@ -50,5 +51,18 @@ public class NotificationService {
         notificationRepository.save(notification);
 
         return RsData.of("S-1", "호감 변경에 대해 알림을 보냈습니다.");
+    }
+
+    public RsData<List<Notification>> updateReadDate(InstaMember instaMember, LocalDateTime currentTime) {
+        List<Notification> notifications = findByToInstaMemberOrderByCreateDateDesc(instaMember); //나를 좋아하는 것에 대한 알림들
+        for(Notification notification : notifications){
+            if(notification.getReadDate() == null) { //최초로 읽은 날짜를 기록하기 위해, readDate가 null인 경우에만 현재 날짜를 설정
+                notification.setReadDate(currentTime);
+                System.out.println(notification.getReadDate());
+                notificationRepository.save(notification);
+            }
+        }
+
+        return RsData.of("S-1", "readDate가 현재시간으로 업데이트되었습니다.", notifications);
     }
 }
