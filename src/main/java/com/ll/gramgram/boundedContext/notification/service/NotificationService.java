@@ -53,6 +53,7 @@ public class NotificationService {
         return RsData.of("S-1", "호감 변경에 대해 알림을 보냈습니다.");
     }
 
+    @Transactional
     public RsData<List<Notification>> updateReadDate(InstaMember instaMember, LocalDateTime currentTime) {
         List<Notification> notifications = findByToInstaMemberOrderByCreateDateDesc(instaMember); //나를 좋아하는 것에 대한 알림들
         for(Notification notification : notifications){
