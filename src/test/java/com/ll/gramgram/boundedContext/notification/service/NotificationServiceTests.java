@@ -53,7 +53,7 @@ public class NotificationServiceTests {
     }
 
     @Test
-    @DisplayName("호감사유 변경 시. 알림 추가")
+    @DisplayName("기존의 호감 사유 변경 시. 알림 생성")
     void t002() throws Exception {
         Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
         Member memberUser2 = memberService.findByUsername("user2").orElseThrow();
