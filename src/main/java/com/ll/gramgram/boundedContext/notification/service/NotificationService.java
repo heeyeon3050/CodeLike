@@ -27,8 +27,8 @@ public class NotificationService {
                 .fromInstaMember(fromInstaMember)
                 .toInstaMember(toInstaMember)
                 .typeCode("like")
-                .newGender(newGender)
-                .newAttractiveTypeCode(newAttractiveTypeCode)
+                .newGender(newGender) // 최초 성별
+                .newAttractiveTypeCode(newAttractiveTypeCode) // 최초 호감 사유
                 .build();
 
         notificationRepository.save(notification);
@@ -43,8 +43,8 @@ public class NotificationService {
                 .fromInstaMember(fromInstaMember)
                 .toInstaMember(toInstaMember)
                 .typeCode("ModifyAttractiveType")
-                .oldAttractiveTypeCode(oldAttractiveTypeCode)
-                .newAttractiveTypeCode(newAttractiveTypeCode)
+                .oldAttractiveTypeCode(oldAttractiveTypeCode) // 기존의 호감사유
+                .newAttractiveTypeCode(newAttractiveTypeCode) // 새로운 호감사유
                 .build();
 
         notificationRepository.save(notification);
