@@ -18,7 +18,7 @@ spring:
           facebook:
             redirect-uri: 'https://www.ouo.ac/{baseUrl}/{action}/oauth2/code/{registrationId}'
           instagram:
-            redirect-uri: "https://www.ouo.ac/{baseUrl}/{action}/oauth2/code/{registrationId}"
+            redirect-uri: 'https://www.ouo.ac/{baseUrl}/{action}/oauth2/code/{registrationId}'
   jpa:
     hibernate:
       ddl-auto: update
