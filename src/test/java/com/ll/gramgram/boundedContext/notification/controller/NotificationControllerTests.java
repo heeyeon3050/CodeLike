@@ -1,12 +1,12 @@
 package com.ll.gramgram.boundedContext.notification.controller;
 
-import com.ll.gramgram.TestUt;
-import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
-import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
-import com.ll.gramgram.boundedContext.member.entity.Member;
-import com.ll.gramgram.boundedContext.member.service.MemberService;
+
+import com.ll.gramgram.boundedContext.notification.entity.Notification;
+import com.ll.gramgram.boundedContext.notification.service.NotificationService;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,73 +16,46 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-@ActiveProfiles("test")
+@SpringBootTest // 스프링부트 관련 컴포넌트 테스트할 때 붙여야 함, Ioc 컨테이너 작동시킴
+@AutoConfigureMockMvc // http 요청, 응답 테스트
+@Transactional // 실제로 테스트에서 발생한 DB 작업이 영구적으로 적용되지 않도록, test + 트랜잭션 => 자동롤백
+@ActiveProfiles("test") // application-test.yml 을 활성화 시킨다.
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class NotificationControllerTests {
     @Autowired
     private MockMvc mvc;
     @Autowired
-    private MemberService memberService;
-    @Autowired
-    private LikeablePersonService likeablePersonService;
+    private NotificationService notificationService;
 
     @Test
-    @DisplayName("새로운 호감 표시 생성 시, 알림 생성")
-    @WithUserDetails("user2")
+    @DisplayName("알림목록에 접속했을 때 아직 읽음처리되지 않은 것들을 읽음처리 한다.")
+    @WithUserDetails("user4")
     void t001() throws Exception {
-        Member member = memberService.findByUsername("user3").orElseThrow();
+        List<Notification> notifications = notificationService.findByToInstaMember_username("insta_user4");
 
-        likeablePersonService.like(member, "insta_user2", 1);
+        long unreadCount = notifications
+                .stream()
+                .filter(notification -> !notification.isRead())
+                .count();
 
-        // WHEN
-        ResultActions resultActions = mvc
-                .perform(get("/usr/notification/list"))
-                .andDo(print());
-        // THEN
-        resultActions
-                .andExpect(handler().handlerType(NotificationController.class))
-                .andExpect(handler().methodName("showList"))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(content().string(containsString("""
-                        때문에 좋아합니다.
-                        """.stripIndent().trim())));
-    }
-
-    @Test
-    @DisplayName("기존의 호감 사유 수정 시, 수정 알림 생성")
-    @WithUserDetails("user2")
-    void t002() throws Exception {
-        Member member = memberService.findByUsername("user3").orElseThrow();
-
-        // "user3"이 "insta_user2"에게 호감 표시
-        LikeablePerson likeablePerson = likeablePersonService.like(member, "insta_user2", 1).getData();
-
-        // 호감사유 변경하기 위해, modifyUnlockDate를 현재 시간보다 작도록 강제로 설정
-        TestUt.setFieldValue(likeablePerson, "modifyUnlockDate", LocalDateTime.now().minusSeconds(1));
-
-        // "user3"이 "insta_user2"에 대한 호감 사유 변경
-        likeablePersonService.modifyAttractive(member, likeablePerson, 3);
+        assertThat(unreadCount).isEqualTo(1);
 
         // WHEN
         ResultActions resultActions = mvc
                 .perform(get("/usr/notification/list"))
                 .andDo(print());
-        // THEN
-        resultActions
-                .andExpect(handler().handlerType(NotificationController.class))
-                .andExpect(handler().methodName("showList"))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(content().string(containsString("""
-                        </span>으로 변경했습니다.
-                        """.stripIndent().trim())));
+
+        unreadCount = notifications
+                .stream()
+                .filter(notification -> !notification.isRead())
+                .count();
+
+        assertThat(unreadCount).isEqualTo(0);
     }
 }

@@ -49,17 +49,17 @@ public class NotificationService {
         return RsData.of("S-1", "알림 메세지가 생성되었습니다.", notification);
     }
 
-    @Transactional
-    public RsData<List<Notification>> updateReadDate(InstaMember instaMember, LocalDateTime currentTime) {
-        List<Notification> notifications = findByToInstaMember(instaMember); //나를 좋아하는 것에 대한 알림들
-        for(Notification notification : notifications){
-            if(notification.getReadDate() == null) { //최초로 읽은 날짜를 기록하기 위해, readDate가 null인 경우에만 현재 날짜를 설정
-                notification.setReadDate(currentTime);
-                System.out.println(notification.getReadDate());
-                notificationRepository.save(notification);
-            }
-        }
+    public List<Notification> findByToInstaMember_username(String username) {
+        return notificationRepository.findByToInstaMember_username(username);
+    }
 
-        return RsData.of("S-1", "readDate가 설정되었습니다.", notifications);
+    @Transactional
+    public RsData markAsRead(List<Notification> notifications) {
+        notifications
+                .stream()
+                .filter(notification -> !notification.isRead())
+                .forEach(Notification::markAsRead);
+
+        return RsData.of("S-1", "읽음 처리 되었습니다.");
     }
 }
