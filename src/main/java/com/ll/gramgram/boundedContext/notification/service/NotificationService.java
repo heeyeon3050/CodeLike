@@ -2,13 +2,13 @@ package com.ll.gramgram.boundedContext.notification.service;
 
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
+import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.notification.entity.Notification;
 import com.ll.gramgram.boundedContext.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,53 +17,52 @@ import java.util.List;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
 
-    public List<Notification> findByToInstaMemberOrderByCreateDateDesc(InstaMember instaMember) {
-        return notificationRepository.findByToInstaMemberOrderByCreateDateDesc(instaMember);
+    public List<Notification> findByToInstaMember(InstaMember toInstaMember) {
+        return notificationRepository.findByToInstaMemberOrderByIdDesc(toInstaMember);
     }
 
     @Transactional
-    public RsData make(InstaMember fromInstaMember, InstaMember toInstaMember, String newGender, int newAttractiveTypeCode ){
+    public RsData<Notification> makeLike(LikeablePerson likeablePerson) {
+        return make(likeablePerson, "LIKE", 0, null);
+    }
+
+    @Transactional
+    public RsData<Notification> makeModifyAttractive(LikeablePerson likeablePerson, int oldAttractiveTypeCode) {
+        return make(likeablePerson, "MODIFY_ATTRACTIVE_TYPE", oldAttractiveTypeCode, likeablePerson.getFromInstaMember().getGender());
+    }
+
+    private RsData<Notification> make(LikeablePerson likeablePerson, String typeCode, int oldAttractiveTypeCode, String oldGender) {
         Notification notification = Notification
                 .builder()
-                .fromInstaMember(fromInstaMember)
-                .toInstaMember(toInstaMember)
-                .typeCode("like")
-                .newGender(newGender) // 최초 성별
-                .newAttractiveTypeCode(newAttractiveTypeCode) // 최초 호감 사유
+                .typeCode(typeCode)
+                .toInstaMember(likeablePerson.getToInstaMember())
+                .fromInstaMember(likeablePerson.getFromInstaMember())
+                .oldAttractiveTypeCode(oldAttractiveTypeCode)
+                .oldGender(oldGender)
+                .newAttractiveTypeCode(likeablePerson.getAttractiveTypeCode())
+                .newGender(likeablePerson.getFromInstaMember().getGender())
                 .build();
 
         notificationRepository.save(notification);
 
-        return RsData.of("S-1", "호감 표시에 대해 알림을 보냈습니다.");
+        return RsData.of("S-1", "알림 메세지가 생성되었습니다.", notification);
+    }
+
+    public List<Notification> findByToInstaMember_username(String username) {
+        return notificationRepository.findByToInstaMember_usernameOrderByIdDesc(username);
     }
 
     @Transactional
-    public RsData make(InstaMember fromInstaMember, InstaMember toInstaMember, int oldAttractiveTypeCode, int newAttractiveTypeCode ){
-        Notification notification = Notification
-                .builder()
-                .fromInstaMember(fromInstaMember)
-                .toInstaMember(toInstaMember)
-                .typeCode("ModifyAttractiveType")
-                .oldAttractiveTypeCode(oldAttractiveTypeCode) // 기존의 호감사유
-                .newAttractiveTypeCode(newAttractiveTypeCode) // 새로운 호감사유
-                .build();
+    public RsData markAsRead(List<Notification> notifications) {
+        notifications
+                .stream()
+                .filter(notification -> !notification.isRead())
+                .forEach(Notification::markAsRead);
 
-        notificationRepository.save(notification);
-
-        return RsData.of("S-1", "호감 변경에 대해 알림을 보냈습니다.");
+        return RsData.of("S-1", "읽음 처리 되었습니다.");
     }
 
-    @Transactional
-    public RsData<List<Notification>> updateReadDate(InstaMember instaMember, LocalDateTime currentTime) {
-        List<Notification> notifications = findByToInstaMemberOrderByCreateDateDesc(instaMember); //나를 좋아하는 것에 대한 알림들
-        for(Notification notification : notifications){
-            if(notification.getReadDate() == null) { //최초로 읽은 날짜를 기록하기 위해, readDate가 null인 경우에만 현재 날짜를 설정
-                notification.setReadDate(currentTime);
-                System.out.println(notification.getReadDate());
-                notificationRepository.save(notification);
-            }
-        }
-
-        return RsData.of("S-1", "readDate가 현재시간으로 업데이트되었습니다.", notifications);
+    public boolean countUnreadNotificationsByToInstaMember(InstaMember instaMember) {
+        return notificationRepository.countByToInstaMemberAndReadDateIsNull(instaMember) > 0;
     }
 }

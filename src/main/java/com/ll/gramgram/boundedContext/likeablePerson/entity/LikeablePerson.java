@@ -3,8 +3,8 @@ package com.ll.gramgram.boundedContext.likeablePerson.entity;
 import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.base.baseEntity.BaseEntity;
 import com.ll.gramgram.base.rsData.RsData;
-import com.ll.gramgram.standard.util.Ut;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
+import com.ll.gramgram.standard.util.Ut;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
@@ -12,9 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 @Entity
 @Getter
@@ -42,34 +40,7 @@ public class LikeablePerson extends BaseEntity {
 
     // 초 단위에서 올림 해주세요.
     public String getModifyUnlockDateRemainStrHuman() {
-        //현재 시간
-        LocalDateTime currentTime = LocalDateTime.now();
-
-        //두 시간 사이의 차이 계산
-        Duration duration = Duration.between(currentTime, modifyUnlockDate);
-
-        //올림을 적용한 시간 차이 계산
-        long hours = duration.toHours();
-        long minutes = duration.toMinutes() % 60;
-        long seconds = duration.toSeconds() % 60;
-
-        // 초가 남았을 경우 분에 1을 더함
-        if (seconds > 0) {
-            minutes += 1;
-        }
-
-        // 분이 60일 경우 시간에 1을 더하고 분을 0으로 초기화
-        if (minutes == 60) {
-            hours += 1;
-            minutes = 0;
-        }
-
-        //0시간일 경우 분만 출력
-        if (hours == 0) {
-            return minutes + "분";
-        }
-
-        return hours + "시간 " + minutes + "분";
+        return Ut.time.diffFormat1Human(LocalDateTime.now(), modifyUnlockDate);
     }
 
     public RsData updateAttractionTypeCode(int attractiveTypeCode) {
@@ -101,17 +72,5 @@ public class LikeablePerson extends BaseEntity {
 
     public String getJdenticon() {
         return Ut.hash.sha256(fromInstaMember.getId() + "_likes_" + toInstaMember.getId());
-    }
-
-    public boolean getChangeableTime(){
-        LocalDateTime currentTime = LocalDateTime.now();
-        long diffInHours = ChronoUnit.HOURS.between(getModifyDate(), currentTime);
-
-        long time = AppConfig.getChangeableTime();
-
-        if(diffInHours < time) {
-            return false;
-        }
-        return true;
     }
 }

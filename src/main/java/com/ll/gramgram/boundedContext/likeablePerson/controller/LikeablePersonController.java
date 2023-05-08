@@ -90,7 +90,7 @@ public class LikeablePersonController {
     public String showModify(@PathVariable Long id, Model model) {
         LikeablePerson likeablePerson = likeablePersonService.findById(id).orElseThrow();
 
-        RsData canModifyRsData = likeablePersonService.canModifyLike(rq.getMember(), likeablePerson);
+        RsData canModifyRsData = likeablePersonService.canModify(rq.getMember(), likeablePerson);
 
         if (canModifyRsData.isFail()) return rq.historyBack(canModifyRsData);
 
@@ -101,7 +101,7 @@ public class LikeablePersonController {
 
     @AllArgsConstructor
     @Getter
-    public static class aaa {
+    public static class ModifyForm {
         @NotNull
         @Min(1)
         @Max(3)
@@ -110,7 +110,7 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
-    public String modify(@PathVariable Long id, @Valid aaa modifyForm) {
+    public String modify(@PathVariable Long id, @Valid ModifyForm modifyForm) {
         RsData<LikeablePerson> rsData = likeablePersonService.modifyAttractive(rq.getMember(), id, modifyForm.getAttractiveTypeCode());
 
         if (rsData.isFail()) {
@@ -122,9 +122,16 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/toList")
-    @ResponseBody
     public String showToList(Model model) {
-        //TODO : showToList 구현해야 함
-        return "usr/likeablePerson/toList 구현해야 함";
+        InstaMember instaMember = rq.getMember().getInstaMember();
+
+        // 인스타인증을 했는지 체크
+        if (instaMember != null) {
+            // 해당 인스타회원이 좋아하는 사람들 목록
+            List<LikeablePerson> likeablePeople = instaMember.getToLikeablePeople();
+            model.addAttribute("likeablePeople", likeablePeople);
+        }
+
+        return "usr/likeablePerson/toList";
     }
 }

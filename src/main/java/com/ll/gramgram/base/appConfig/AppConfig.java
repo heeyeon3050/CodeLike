@@ -10,8 +10,6 @@ import java.time.LocalDateTime;
 public class AppConfig {
     @Getter
     private static long likeablePersonFromMax;
-    @Getter
-    private static long changeableTime;
 
     @Value("${custom.likeablePerson.from.max}")
     public void setLikeablePersonFromMax(long likeablePersonFromMax) {
@@ -30,3 +28,4 @@ public class AppConfig {
         return LocalDateTime.now().plusSeconds(likeablePersonModifyCoolTime);
     }
 }
+

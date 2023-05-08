@@ -2,21 +2,18 @@ package com.ll.gramgram.boundedContext.notification.entity;
 
 import com.ll.gramgram.base.baseEntity.BaseEntity;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
+import com.ll.gramgram.standard.util.Ut;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
@@ -34,45 +31,43 @@ public class Notification extends BaseEntity {
     private String newGender; // 해당사항 없으면 null
     private int newAttractiveTypeCode; // 해당사항 없으면 0
 
-    public String getCreateDateStr() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm");
-        return getCreateDate().format(formatter);
+    public boolean isRead() {
+        return readDate != null;
     }
 
-    public String getDifferenceTimeStrHuman() {
-
-        //두 시간 사이의 차이 계산
-        Duration duration = Duration.between(getCreateDate(), LocalDateTime.now());
-
-        //올림을 적용한 시간 차이 계산
-        long hours = duration.toHours();
-        long minutes = duration.toMinutes() % 60;
-        long seconds = duration.toSeconds() % 60;
-
-        // 초가 남았을 경우 분에 1을 더함
-        if (seconds > 0) {
-            minutes += 1;
-        }
-
-        // 분이 60일 경우 시간에 1을 더하고 분을 0으로 초기화
-        if (minutes == 60) {
-            hours += 1;
-            minutes = 0;
-        }
-
-        //0시간일 경우 분만 출력
-        if (hours == 0) {
-            return minutes + "분";
-        }
-
-        return hours + "시간 " + minutes + "분";
+    public void markAsRead() {
+        readDate = LocalDateTime.now();
     }
 
-    public String getAttractiveTypeDisplayName(int attractiveTypeCode) {
-        return switch (attractiveTypeCode) {
+    public String getCreateDateAfterStrHuman() {
+        return Ut.time.diffFormat1Human(LocalDateTime.now(), getCreateDate());
+    }
+
+    public boolean isHot() {
+        // 만들어진지 60분이 안되었다면 hot 으로 설정
+        return getCreateDate().isAfter(LocalDateTime.now().minusMinutes(60));
+    }
+
+    public String getOldAttractiveTypeDisplayName() {
+        return switch (oldAttractiveTypeCode) {
             case 1 -> "외모";
             case 2 -> "성격";
             default -> "능력";
+        };
+    }
+
+    public String getNewAttractiveTypeDisplayName() {
+        return switch (newAttractiveTypeCode) {
+            case 1 -> "외모";
+            case 2 -> "성격";
+            default -> "능력";
+        };
+    }
+
+    public String getNewGenderDisplayName() {
+        return switch (newGender) {
+            case "W" -> "여성";
+            default -> "남성";
         };
     }
 }
