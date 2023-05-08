@@ -172,7 +172,6 @@ public class LikeablePersonControllerTests {
         ResultActions resultActions = mvc
                 .perform(post("/usr/likeablePerson/modify/2")
                         .with(csrf()) // CSRF 키 생성
-                        .param("username", "abcd")
                         .param("attractiveTypeCode", "3")
                 )
                 .andDo(print());

@@ -3,8 +3,8 @@ package com.ll.gramgram.boundedContext.likeablePerson.entity;
 import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.base.baseEntity.BaseEntity;
 import com.ll.gramgram.base.rsData.RsData;
-import com.ll.gramgram.standard.util.Ut;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
+import com.ll.gramgram.standard.util.Ut;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
@@ -12,9 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 @Entity
 @Getter
@@ -74,17 +72,5 @@ public class LikeablePerson extends BaseEntity {
 
     public String getJdenticon() {
         return Ut.hash.sha256(fromInstaMember.getId() + "_likes_" + toInstaMember.getId());
-    }
-
-    public boolean getChangeableTime(){
-        LocalDateTime currentTime = LocalDateTime.now();
-        long diffInHours = ChronoUnit.HOURS.between(getModifyDate(), currentTime);
-
-        long time = AppConfig.getChangeableTime();
-
-        if(diffInHours < time) {
-            return false;
-        }
-        return true;
     }
 }

@@ -7,17 +7,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
@@ -41,11 +37,6 @@ public class Notification extends BaseEntity {
 
     public void markAsRead() {
         readDate = LocalDateTime.now();
-    }
-
-    public String getCreateDateStr() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy-MM-dd HH:mm");
-        return getCreateDate().format(formatter);
     }
 
     public String getCreateDateAfterStrHuman() {

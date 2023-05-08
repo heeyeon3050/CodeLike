@@ -14,6 +14,7 @@ import java.util.Enumeration;
 @RequiredArgsConstructor
 public class HomeController {
     private final Rq rq;
+
     @GetMapping("/")
     public String showMain() {
         if (rq.isLogout()) return "redirect:/usr/member/login";
@@ -44,6 +45,6 @@ public class HomeController {
     @GetMapping("/usr/historyBackTest")
     @PreAuthorize("hasAuthority('admin')")
     public String showHistoryBackTest(HttpSession session) {
-        return rq.historyBack("이 페이지로는 올 수 없습니다.");
+        return rq.historyBack("여기는 당신같은 사람이 오면 안되요.");
     }
 }
