@@ -2,6 +2,7 @@ package com.ll.gramgram.boundedContext.notification.service;
 
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
+import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.notification.entity.Notification;
 import com.ll.gramgram.boundedContext.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,35 +23,39 @@ public class NotificationService {
     }
 
     @Transactional
-    public RsData make(InstaMember fromInstaMember, InstaMember toInstaMember, String newGender, int newAttractiveTypeCode ){
+    public RsData<Notification> makeLike(LikeablePerson likeablePerson) {
         Notification notification = Notification
                 .builder()
-                .fromInstaMember(fromInstaMember)
-                .toInstaMember(toInstaMember)
-                .typeCode("like")
-                .newGender(newGender) // 최초 성별
-                .newAttractiveTypeCode(newAttractiveTypeCode) // 최초 호감 사유
+                .typeCode("LIKE")
+                .toInstaMember(likeablePerson.getToInstaMember())
+                .fromInstaMember(likeablePerson.getFromInstaMember())
+                .oldAttractiveTypeCode(0)
+                .oldGender(null)
+                .newAttractiveTypeCode(likeablePerson.getAttractiveTypeCode())
+                .newGender(likeablePerson.getFromInstaMember().getGender())
                 .build();
 
         notificationRepository.save(notification);
 
-        return RsData.of("S-1", "호감 표시에 대해 알림을 보냈습니다.");
+        return RsData.of("S-1", "알림 메세지가 생성되었습니다.", notification);
     }
 
     @Transactional
-    public RsData make(InstaMember fromInstaMember, InstaMember toInstaMember, int oldAttractiveTypeCode, int newAttractiveTypeCode ){
+    public RsData<Notification> makeModifyAttractive(LikeablePerson likeablePerson, int oldAttractiveTypeCode) {
         Notification notification = Notification
                 .builder()
-                .fromInstaMember(fromInstaMember)
-                .toInstaMember(toInstaMember)
                 .typeCode("ModifyAttractiveType")
-                .oldAttractiveTypeCode(oldAttractiveTypeCode) // 기존의 호감사유
-                .newAttractiveTypeCode(newAttractiveTypeCode) // 새로운 호감사유
+                .toInstaMember(likeablePerson.getToInstaMember())
+                .fromInstaMember(likeablePerson.getFromInstaMember())
+                .oldAttractiveTypeCode(oldAttractiveTypeCode)
+                .oldGender(likeablePerson.getFromInstaMember().getGender())
+                .newAttractiveTypeCode(likeablePerson.getAttractiveTypeCode())
+                .newGender(likeablePerson.getFromInstaMember().getGender())
                 .build();
 
         notificationRepository.save(notification);
 
-        return RsData.of("S-1", "호감 변경에 대해 알림을 보냈습니다.");
+        return RsData.of("S-1", "알림 메세지가 생성되었습니다.", notification);
     }
 
     @Transactional
@@ -64,6 +69,6 @@ public class NotificationService {
             }
         }
 
-        return RsData.of("S-1", "readDate가 현재시간으로 업데이트되었습니다.", notifications);
+        return RsData.of("S-1", "readDate가 설정되었습니다.", notifications);
     }
 }

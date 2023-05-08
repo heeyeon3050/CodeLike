@@ -103,8 +103,6 @@ public class InstaMemberService {
         InstaMemberSnapshot snapshot = toInstaMember.snapshot("ModifyAttractiveType");
 
         saveSnapshot(snapshot);
-
-        notificationService.make(likeablePerson.getFromInstaMember(), likeablePerson.getToInstaMember(), oldAttractiveTypeCode, likeablePerson.getAttractiveTypeCode());
     }
 
     public void whenAfterLike(LikeablePerson likeablePerson) {
@@ -116,8 +114,6 @@ public class InstaMemberService {
         InstaMemberSnapshot snapshot = toInstaMember.snapshot("Like");
 
         saveSnapshot(snapshot);
-
-        notificationService.make(likeablePerson.getFromInstaMember(), likeablePerson.getToInstaMember(), fromInstaMember.getGender(), likeablePerson.getAttractiveTypeCode());
     }
 
     public void whenBeforeCancelLike(LikeablePerson likeablePerson) {
