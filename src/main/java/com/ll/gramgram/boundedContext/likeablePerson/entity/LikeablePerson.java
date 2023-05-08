@@ -42,34 +42,7 @@ public class LikeablePerson extends BaseEntity {
 
     // 초 단위에서 올림 해주세요.
     public String getModifyUnlockDateRemainStrHuman() {
-        //현재 시간
-        LocalDateTime currentTime = LocalDateTime.now();
-
-        //두 시간 사이의 차이 계산
-        Duration duration = Duration.between(currentTime, modifyUnlockDate);
-
-        //올림을 적용한 시간 차이 계산
-        long hours = duration.toHours();
-        long minutes = duration.toMinutes() % 60;
-        long seconds = duration.toSeconds() % 60;
-
-        // 초가 남았을 경우 분에 1을 더함
-        if (seconds > 0) {
-            minutes += 1;
-        }
-
-        // 분이 60일 경우 시간에 1을 더하고 분을 0으로 초기화
-        if (minutes == 60) {
-            hours += 1;
-            minutes = 0;
-        }
-
-        //0시간일 경우 분만 출력
-        if (hours == 0) {
-            return minutes + "분";
-        }
-
-        return hours + "시간 " + minutes + "분";
+        return Ut.time.diffFormat1Human(LocalDateTime.now(), modifyUnlockDate);
     }
 
     public RsData updateAttractionTypeCode(int attractiveTypeCode) {
