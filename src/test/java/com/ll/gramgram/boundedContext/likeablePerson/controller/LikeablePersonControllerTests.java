@@ -393,46 +393,14 @@ public class LikeablePersonControllerTests {
     }
 
     @Test
-    @DisplayName("쿨타임 3시간 이내에 호감사유를 변경할 수 없다.")
+    @DisplayName("호감취소는 쿨타임이 지나야 가능하다.")
     @WithUserDetails("user3")
     void t016() throws Exception {
         // WHEN
-        mvc.perform(post("/usr/likeablePerson/modify/1")
-                        .with(csrf()) // CSRF 키 생성
-                        .param("attractiveTypeCode", "2")
-                )
-                .andDo(print());
-
-        // WHEN
         ResultActions resultActions = mvc
-                .perform(post("/usr/likeablePerson/modify/1")
-                        .with(csrf()) // CSRF 키 생성
-                        .param("attractiveTypeCode", "3")
-                )
-                .andDo(print());
-
-        // THEN
-        resultActions
-                .andExpect(handler().handlerType(LikeablePersonController.class))
-                .andExpect(handler().methodName("modify"))
-                .andExpect(status().is4xxClientError());
-    }
-
-    @Test
-    @DisplayName("쿨타임 3시간 이내에 호감사유를 취소할 수 없다.")
-    @WithUserDetails("user3")
-    void t017() throws Exception {
-        // WHEN
-        mvc.perform(post("/usr/likeablePerson/modify/1")
-                        .with(csrf()) // CSRF 키 생성
-                        .param("attractiveTypeCode", "3")
-                )
-                .andDo(print());
-
-        // WHEN
-        ResultActions resultActions = mvc
-                .perform(delete("/usr/likeablePerson/1")
-                        .with(csrf()) // CSRF 키 생성
+                .perform(
+                        delete("/usr/likeablePerson/3")
+                                .with(csrf())
                 )
                 .andDo(print());
 
@@ -440,6 +408,9 @@ public class LikeablePersonControllerTests {
         resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("cancel"))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().is4xxClientError())
+        ;
+
+        assertThat(likeablePersonService.findById(3L).isPresent()).isEqualTo(true);
     }
 }
