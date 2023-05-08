@@ -2,6 +2,7 @@ package com.ll.gramgram.boundedContext.notification.entity;
 
 import com.ll.gramgram.base.baseEntity.BaseEntity;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
+import com.ll.gramgram.standard.util.Ut;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
@@ -47,33 +48,8 @@ public class Notification extends BaseEntity {
         return getCreateDate().format(formatter);
     }
 
-    public String getDifferenceTimeStrHuman() {
-
-        //두 시간 사이의 차이 계산
-        Duration duration = Duration.between(getCreateDate(), LocalDateTime.now());
-
-        //올림을 적용한 시간 차이 계산
-        long hours = duration.toHours();
-        long minutes = duration.toMinutes() % 60;
-        long seconds = duration.toSeconds() % 60;
-
-        // 초가 남았을 경우 분에 1을 더함
-        if (seconds > 0) {
-            minutes += 1;
-        }
-
-        // 분이 60일 경우 시간에 1을 더하고 분을 0으로 초기화
-        if (minutes == 60) {
-            hours += 1;
-            minutes = 0;
-        }
-
-        //0시간일 경우 분만 출력
-        if (hours == 0) {
-            return minutes + "분";
-        }
-
-        return hours + "시간 " + minutes + "분";
+    public String getCreateDateAfterStrHuman() {
+        return Ut.time.diffFormat1Human(LocalDateTime.now(), getCreateDate());
     }
 
     public String getAttractiveTypeDisplayName(int attractiveTypeCode) {
