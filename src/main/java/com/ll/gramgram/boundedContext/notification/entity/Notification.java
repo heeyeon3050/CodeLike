@@ -52,11 +52,31 @@ public class Notification extends BaseEntity {
         return Ut.time.diffFormat1Human(LocalDateTime.now(), getCreateDate());
     }
 
-    public String getAttractiveTypeDisplayName(int attractiveTypeCode) {
-        return switch (attractiveTypeCode) {
+    public boolean isHot() {
+        // 만들어진지 60분이 안되었다면 hot 으로 설정
+        return getCreateDate().isAfter(LocalDateTime.now().minusMinutes(60));
+    }
+
+    public String getOldAttractiveTypeDisplayName() {
+        return switch (oldAttractiveTypeCode) {
             case 1 -> "외모";
             case 2 -> "성격";
             default -> "능력";
+        };
+    }
+
+    public String getNewAttractiveTypeDisplayName() {
+        return switch (newAttractiveTypeCode) {
+            case 1 -> "외모";
+            case 2 -> "성격";
+            default -> "능력";
+        };
+    }
+
+    public String getNewGenderDisplayName() {
+        return switch (newGender) {
+            case "W" -> "여성";
+            default -> "남성";
         };
     }
 }
