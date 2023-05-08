@@ -18,8 +18,8 @@ import java.util.List;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
 
-    public List<Notification> findByToInstaMemberOrderByCreateDateDesc(InstaMember instaMember) {
-        return notificationRepository.findByToInstaMemberOrderByCreateDateDesc(instaMember);
+    public List<Notification> findByToInstaMember(InstaMember toInstaMember) {
+        return notificationRepository.findByToInstaMember(toInstaMember);
     }
 
     @Transactional
@@ -29,7 +29,7 @@ public class NotificationService {
 
     @Transactional
     public RsData<Notification> makeModifyAttractive(LikeablePerson likeablePerson, int oldAttractiveTypeCode) {
-        return make(likeablePerson, "ModifyAttractiveType", oldAttractiveTypeCode, likeablePerson.getFromInstaMember().getGender());
+        return make(likeablePerson, "MODIFY_ATTRACTIVE_TYPE", oldAttractiveTypeCode, likeablePerson.getFromInstaMember().getGender());
     }
 
     private RsData<Notification> make(LikeablePerson likeablePerson, String typeCode, int oldAttractiveTypeCode, String oldGender) {
@@ -51,7 +51,7 @@ public class NotificationService {
 
     @Transactional
     public RsData<List<Notification>> updateReadDate(InstaMember instaMember, LocalDateTime currentTime) {
-        List<Notification> notifications = findByToInstaMemberOrderByCreateDateDesc(instaMember); //나를 좋아하는 것에 대한 알림들
+        List<Notification> notifications = findByToInstaMember(instaMember); //나를 좋아하는 것에 대한 알림들
         for(Notification notification : notifications){
             if(notification.getReadDate() == null) { //최초로 읽은 날짜를 기록하기 위해, readDate가 null인 경우에만 현재 날짜를 설정
                 notification.setReadDate(currentTime);
