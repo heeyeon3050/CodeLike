@@ -124,24 +124,12 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/toList")
-    public String showToList(Model model, String gender) {
+    public String showToList(Model model, String gender,
+                             @RequestParam(defaultValue = "0") int attractiveTypeCode) {
         InstaMember instaMember = rq.getMember().getInstaMember();
-        // 인스타인증을 했는지 체크
-        if (instaMember != null) {
-            // 해당 인스타회원을 좋아하는 사람들 목록
-            List<LikeablePerson> likeablePeople = instaMember.getToLikeablePeople();
-            // stream 형태로 변환
-            Stream<LikeablePerson> stream = likeablePeople.stream();
 
-            if(gender != null && gender.length() > 0){
-                //해당 인스타회원을 좋아하는 사람들 중에서 성별이 gender과 같은 사람만 필터링
-                stream = stream.filter(e -> e.getFromInstaMember().getGender().equals(gender));
-            }
-
-            List<LikeablePerson> newData = stream.collect(Collectors.toList());
-
-            model.addAttribute("likeablePeople", newData);
-        }
+        RsData<List<LikeablePerson>> likeablePeople = likeablePersonService.getLikeablePeople(instaMember, gender, attractiveTypeCode);
+        model.addAttribute("likeablePeople", likeablePeople.getData());
 
         return "usr/likeablePerson/toList";
     }

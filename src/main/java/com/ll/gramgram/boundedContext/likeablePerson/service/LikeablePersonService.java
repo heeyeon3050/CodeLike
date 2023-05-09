@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -218,5 +220,28 @@ public class LikeablePersonService {
 
 
         return RsData.of("S-1", "호감사유변경이 가능합니다.");
+    }
+
+    public RsData<List<LikeablePerson>> getLikeablePeople(InstaMember instaMember, String gender, int attractiveTypeCode) {
+        // 인스타인증을 했는지 체크
+        if (instaMember != null) {
+            // 해당 인스타회원이 좋아하는 사람들 목록
+            List<LikeablePerson> likeablePeople = instaMember.getToLikeablePeople();
+
+            Stream<LikeablePerson> stream = likeablePeople.stream();
+
+            if (gender != null && gender.length() > 0) {
+                stream = stream.filter(e -> e.getFromInstaMember().getGender().equals(gender));
+            }
+
+            if (attractiveTypeCode != 0) {
+                stream = stream.filter(e -> e.getAttractiveTypeCode() == attractiveTypeCode);
+            }
+
+            List<LikeablePerson> newData = stream.collect(Collectors.toList());
+
+            return RsData.of("S-1", "내가 받은 호감리스트에서 필터링되어 출력됩니다.", newData);
+        }
+        return RsData.of("F-1", "먼저 본인의 인스타그램 아이디를 입력해주세요.");
     }
 }
