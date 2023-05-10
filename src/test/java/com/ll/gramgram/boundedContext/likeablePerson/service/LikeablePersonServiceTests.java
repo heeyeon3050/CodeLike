@@ -3,6 +3,7 @@ package com.ll.gramgram.boundedContext.likeablePerson.service;
 
 import com.ll.gramgram.TestUt;
 import com.ll.gramgram.base.appConfig.AppConfig;
+import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
@@ -18,6 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -262,5 +264,21 @@ public class LikeablePersonServiceTests {
         assertThat(
                 likeablePersonToBts.getModifyUnlockDate().isAfter(coolTime)
         ).isTrue();
+    }
+
+    @Test
+    @DisplayName("최신순 - 최근에 받은 호감표시를 우선적으로 표시")
+    void t009() {
+        Member memberUser4 = memberService.findByUsername("user4").orElseThrow();
+
+        //최신순으로 정렬
+        RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 1);
+        List<LikeablePerson> newData = result.getData();
+
+        assertThat(newData.get(0).getId().equals(5L));
+        assertThat(newData.get(0).getId().equals(4L));
+        assertThat(newData.get(0).getId().equals(1L));
+
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
     }
 }
