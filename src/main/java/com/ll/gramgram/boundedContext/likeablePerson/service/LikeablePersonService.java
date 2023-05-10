@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -222,7 +223,7 @@ public class LikeablePersonService {
         return RsData.of("S-1", "호감사유변경이 가능합니다.");
     }
 
-    public RsData<List<LikeablePerson>> getLikeablePeople(InstaMember instaMember, String gender, int attractiveTypeCode) {
+    public RsData<List<LikeablePerson>> getLikeablePeople(InstaMember instaMember, String gender, int attractiveTypeCode, int sortCode) {
         // 인스타인증을 했는지 체크
         if (instaMember != null) {
             // 해당 인스타회원이 좋아하는 사람들 목록
@@ -236,6 +237,22 @@ public class LikeablePersonService {
 
             if (attractiveTypeCode != 0) {
                 stream = stream.filter(e -> e.getAttractiveTypeCode() == attractiveTypeCode);
+            }
+
+            switch (sortCode) {
+                case 1:
+                    stream = stream.sorted(Comparator.comparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    break;
             }
 
             List<LikeablePerson> newData = stream.collect(Collectors.toList());

@@ -125,10 +125,12 @@ public class LikeablePersonController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/toList")
     public String showToList(Model model, String gender,
-                             @RequestParam(defaultValue = "0") int attractiveTypeCode) {
+                             @RequestParam(defaultValue = "0") int attractiveTypeCode,
+                             @RequestParam(defaultValue = "1") int sortCode) {
+
         InstaMember instaMember = rq.getMember().getInstaMember();
 
-        RsData<List<LikeablePerson>> likeablePeople = likeablePersonService.getLikeablePeople(instaMember, gender, attractiveTypeCode);
+        RsData<List<LikeablePerson>> likeablePeople = likeablePersonService.getLikeablePeople(instaMember, gender, attractiveTypeCode, sortCode);
         model.addAttribute("likeablePeople", likeablePeople.getData());
 
         return "usr/likeablePerson/toList";
