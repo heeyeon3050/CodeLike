@@ -351,4 +351,22 @@ public class LikeablePersonServiceTests {
         assertThat(newData).isSortedAccordingTo(Comparator.comparing((LikeablePerson e) -> e.getFromInstaMember().getGender().equals("W") ? 0 : 1)
                 .thenComparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
     }
+
+    @Test
+    @DisplayName("호감사유순 - 외모, 성격, 능력순으로 표시, 2순위 정렬조건으로는 최신순")
+    @Rollback(false)
+    void t014() {
+        Member memberUser4 = memberService.findByUsername("user4").orElseThrow();
+
+        //호감사유순으로 정렬
+        RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 6);
+        List<LikeablePerson> newData = result.getData();
+
+        assertThat(newData.get(0).getId().equals(1L));
+        assertThat(newData.get(0).getId().equals(4L));
+        assertThat(newData.get(0).getId().equals(5L));
+
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing((LikeablePerson e) -> e.getAttractiveTypeCode())
+                .thenComparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
+    }
 }
