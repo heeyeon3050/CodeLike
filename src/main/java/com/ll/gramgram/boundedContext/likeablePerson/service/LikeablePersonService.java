@@ -247,8 +247,10 @@ public class LikeablePersonService {
                     stream = stream.sorted(Comparator.comparing(LikeablePerson::getModifyDate));
                     break;
                 case 3:
+                    stream = stream.sorted(Comparator.comparingInt(e -> -e.getFromInstaMember().getToLikeablePeople().size()));
                     break;
                 case 4:
+                    stream = stream.sorted(Comparator.comparingInt(e -> e.getFromInstaMember().getToLikeablePeople().size()));
                     break;
                 case 5:
                     break;
