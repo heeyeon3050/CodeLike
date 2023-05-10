@@ -451,7 +451,7 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("showToList"))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(model().attribute("likeablePeople", hasSize(0))); //user4에는 여성이 한 명이 호감표시를 하고 있으므로 리스트의 사이즈는 0이다.
+                .andExpect(model().attribute("likeablePeople", hasSize(1))); //user4에는 남성 한 명이 호감표시를 하고 있으므로 리스트의 사이즈는 1이다.
     }
 
     @Test
@@ -470,7 +470,7 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("showToList"))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(model().attribute("likeablePeople", hasSize(2))); //user4에는 여성이 한 명이 호감표시를 하고 있으므로 리스트의 사이즈는 1이다.
+                .andExpect(model().attribute("likeablePeople", hasSize(2))); //user4에는 여성이 두 명이 호감표시를 하고 있으므로 리스트의 사이즈는 1이다.
     }
 
     @Test
