@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -280,5 +281,22 @@ public class LikeablePersonServiceTests {
         assertThat(newData.get(0).getId().equals(1L));
 
         assertThat(newData).isSortedAccordingTo(Comparator.comparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
+    }
+
+    @Test
+    @DisplayName("날짜순 - 오래전에 받은 호감표시를 우선적으로 표시")
+    @Rollback(false)
+    void t010() {
+        Member memberUser4 = memberService.findByUsername("user4").orElseThrow();
+
+        //날짜순으로 정렬
+        RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 2);
+        List<LikeablePerson> newData = result.getData();
+
+        assertThat(newData.get(0).getId().equals(1L));
+        assertThat(newData.get(0).getId().equals(4L));
+        assertThat(newData.get(0).getId().equals(5L));
+
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing(LikeablePerson::getModifyDate));
     }
 }
