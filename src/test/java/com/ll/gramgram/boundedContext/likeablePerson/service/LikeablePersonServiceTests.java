@@ -299,4 +299,38 @@ public class LikeablePersonServiceTests {
 
         assertThat(newData).isSortedAccordingTo(Comparator.comparing(LikeablePerson::getModifyDate));
     }
+
+    @Test
+    @DisplayName("인기 많은 순 - 오래전에 받은 호감표시를 우선적으로 표시")
+    @Rollback(false)
+    void t011() {
+        Member memberUser4 = memberService.findByUsername("user4").orElseThrow();
+
+        //인기 많은 순으로 정렬
+        RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 3);
+        List<LikeablePerson> newData = result.getData();
+
+        assertThat(newData.get(0).getId().equals(5L));
+        assertThat(newData.get(0).getId().equals(1L));
+        assertThat(newData.get(0).getId().equals(4L));
+
+        assertThat(newData).isSortedAccordingTo(Comparator.comparingInt(e -> -e.getFromInstaMember().getToLikeablePeople().size()));
+    }
+
+    @Test
+    @DisplayName("인기 적은 순 - 인기가 적은 사람의 호감표시를 우선적으로 표시")
+    @Rollback(false)
+    void t012() {
+        Member memberUser4 = memberService.findByUsername("user4").orElseThrow();
+
+        //인기 적은 순으로 정렬
+        RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 4);
+        List<LikeablePerson> newData = result.getData();
+
+        assertThat(newData.get(0).getId().equals(4L));
+        assertThat(newData.get(0).getId().equals(1L));
+        assertThat(newData.get(0).getId().equals(5L));
+
+        assertThat(newData).isSortedAccordingTo(Comparator.comparingInt(e -> e.getFromInstaMember().getToLikeablePeople().size()));
+    }
 }
