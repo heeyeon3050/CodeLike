@@ -244,6 +244,7 @@ public class LikeablePersonService {
                     stream = stream.sorted(Comparator.comparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
                     break;
                 case 2:
+                    stream = stream.sorted(Comparator.comparing(LikeablePerson::getModifyDate));
                     break;
                 case 3:
                     break;
