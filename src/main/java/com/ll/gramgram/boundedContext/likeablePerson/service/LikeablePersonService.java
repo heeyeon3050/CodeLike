@@ -253,6 +253,9 @@ public class LikeablePersonService {
                     stream = stream.sorted(Comparator.comparingInt(e -> e.getFromInstaMember().getToLikeablePeople().size()));
                     break;
                 case 5:
+                    stream = stream.sorted(
+                            Comparator.comparing((LikeablePerson e) -> e.getFromInstaMember().getGender().equals("W") ? 0 : 1)
+                                    .thenComparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
                     break;
                 case 6:
                     break;
