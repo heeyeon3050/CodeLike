@@ -258,6 +258,9 @@ public class LikeablePersonService {
                                     .thenComparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
                     break;
                 case 6:
+                    stream = stream.sorted(
+                            Comparator.comparing((LikeablePerson e) -> e.getAttractiveTypeCode())
+                                    .thenComparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
                     break;
             }
 
