@@ -244,10 +244,12 @@ public class LikeablePersonService {
                     stream = stream.sorted(Comparator.comparing(LikeablePerson::getId));
                     break;
                 case 3:
-                    stream = stream.sorted(Comparator.comparing(e -> -e.getFromInstaMember().getLikes()));
+                    stream = stream.sorted(Comparator.comparing((LikeablePerson e) -> -e.getFromInstaMember().getLikes())
+                            .thenComparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
                     break;
                 case 4:
-                    stream = stream.sorted(Comparator.comparing(e -> e.getFromInstaMember().getLikes()));
+                    stream = stream.sorted(Comparator.comparing((LikeablePerson e) -> e.getFromInstaMember().getLikes())
+                            .thenComparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
                     break;
                 case 5:
                     stream = stream.sorted(
@@ -256,7 +258,7 @@ public class LikeablePersonService {
                     break;
                 case 6:
                     stream = stream.sorted(
-                            Comparator.comparing((LikeablePerson e) -> e.getAttractiveTypeCode())
+                            Comparator.comparing(LikeablePerson::getAttractiveTypeCode)
                                     .thenComparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
                     break;
             }

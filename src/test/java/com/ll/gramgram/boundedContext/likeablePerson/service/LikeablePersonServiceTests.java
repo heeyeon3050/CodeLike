@@ -276,9 +276,9 @@ public class LikeablePersonServiceTests {
         RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 1);
         List<LikeablePerson> newData = result.getData();
 
-        assertThat(newData.get(0).getId().equals(5L));
-        assertThat(newData.get(0).getId().equals(4L));
-        assertThat(newData.get(0).getId().equals(1L));
+        assertThat(newData.get(0).getId()).isEqualTo(5L);
+        assertThat(newData.get(1).getId()).isEqualTo(4L);
+        assertThat(newData.get(2).getId()).isEqualTo(1L);
 
         assertThat(newData).isSortedAccordingTo(Comparator.comparing(LikeablePerson::getId, Comparator.reverseOrder()));
     }
@@ -293,15 +293,15 @@ public class LikeablePersonServiceTests {
         RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 2);
         List<LikeablePerson> newData = result.getData();
 
-        assertThat(newData.get(0).getId().equals(1L));
-        assertThat(newData.get(0).getId().equals(4L));
-        assertThat(newData.get(0).getId().equals(5L));
+        assertThat(newData.get(0).getId()).isEqualTo(1L);
+        assertThat(newData.get(1).getId()).isEqualTo(4L);
+        assertThat(newData.get(2).getId()).isEqualTo(5L);
 
         assertThat(newData).isSortedAccordingTo(Comparator.comparing(LikeablePerson::getId));
     }
 
     @Test
-    @DisplayName("인기 많은 순 - 오래전에 받은 호감표시를 우선적으로 표시")
+    @DisplayName("인기 많은 순 - 인기가 많은 호감표시를 우선적으로 표시")
     @Rollback(false)
     void t011() {
         Member memberUser4 = memberService.findByUsername("user4").orElseThrow();
@@ -310,11 +310,11 @@ public class LikeablePersonServiceTests {
         RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 3);
         List<LikeablePerson> newData = result.getData();
 
-        assertThat(newData.get(0).getId().equals(5L));
-        assertThat(newData.get(0).getId().equals(1L));
-        assertThat(newData.get(0).getId().equals(4L));
+        assertThat(newData.get(0).getId()).isEqualTo(5L);
+        assertThat(newData.get(1).getId()).isEqualTo(4L);
+        assertThat(newData.get(2).getId()).isEqualTo(1L);
 
-        assertThat(newData).isSortedAccordingTo(Comparator.comparing(e -> e.getFromInstaMember().getLikes(), Comparator.reverseOrder()));
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing(e -> -e.getFromInstaMember().getLikes()));
     }
 
     @Test
@@ -327,9 +327,9 @@ public class LikeablePersonServiceTests {
         RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 4);
         List<LikeablePerson> newData = result.getData();
 
-        assertThat(newData.get(0).getId().equals(4L));
-        assertThat(newData.get(0).getId().equals(1L));
-        assertThat(newData.get(0).getId().equals(5L));
+        assertThat(newData.get(0).getId()).isEqualTo(4L);
+        assertThat(newData.get(1).getId()).isEqualTo(1L);
+        assertThat(newData.get(2).getId()).isEqualTo(5L);
 
         assertThat(newData).isSortedAccordingTo(Comparator.comparing(e -> e.getFromInstaMember().getLikes()));
     }
@@ -344,9 +344,9 @@ public class LikeablePersonServiceTests {
         RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 5);
         List<LikeablePerson> newData = result.getData();
 
-        assertThat(newData.get(0).getId().equals(1L));
-        assertThat(newData.get(0).getId().equals(5L));
-        assertThat(newData.get(0).getId().equals(4L));
+        assertThat(newData.get(0).getId()).isEqualTo(5L);
+        assertThat(newData.get(1).getId()).isEqualTo(1L);
+        assertThat(newData.get(2).getId()).isEqualTo(4L);
 
         assertThat(newData).isSortedAccordingTo(Comparator.comparing((LikeablePerson e) -> e.getFromInstaMember().getGender().equals("W") ? 0 : 1)
                 .thenComparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
@@ -362,11 +362,11 @@ public class LikeablePersonServiceTests {
         RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 6);
         List<LikeablePerson> newData = result.getData();
 
-        assertThat(newData.get(0).getId().equals(1L));
-        assertThat(newData.get(0).getId().equals(4L));
-        assertThat(newData.get(0).getId().equals(5L));
+        assertThat(newData.get(0).getId()).isEqualTo(1L);
+        assertThat(newData.get(1).getId()).isEqualTo(4L);
+        assertThat(newData.get(2).getId()).isEqualTo(5L);
 
-        assertThat(newData).isSortedAccordingTo(Comparator.comparing((LikeablePerson e) -> e.getAttractiveTypeCode())
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing(LikeablePerson::getAttractiveTypeCode)
                 .thenComparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
     }
 }
