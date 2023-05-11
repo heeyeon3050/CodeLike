@@ -231,7 +231,7 @@ public class LikeablePersonService {
 
             Stream<LikeablePerson> stream = likeablePeople.stream();
 
-            if (gender != null && gender.length() > 0) {
+            if (!gender.isEmpty()) {
                 stream = stream.filter(e -> e.getFromInstaMember().getGender().equals(gender));
             }
 
@@ -240,11 +240,8 @@ public class LikeablePersonService {
             }
 
             switch (sortCode) {
-                case 1:
-                    stream = stream.sorted(Comparator.comparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
-                    break;
                 case 2:
-                    stream = stream.sorted(Comparator.comparing(LikeablePerson::getModifyDate));
+                    stream = stream.sorted(Comparator.comparing(LikeablePerson::getId));
                     break;
                 case 3:
                     stream = stream.sorted(Comparator.comparingInt(e -> -e.getFromInstaMember().getToLikeablePeople().size()));

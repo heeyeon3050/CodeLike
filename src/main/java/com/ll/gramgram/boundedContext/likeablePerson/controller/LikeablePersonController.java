@@ -124,7 +124,7 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/toList")
-    public String showToList(Model model, String gender,
+    public String showToList(Model model, @RequestParam(defaultValue = "") String gender,
                              @RequestParam(defaultValue = "0") int attractiveTypeCode,
                              @RequestParam(defaultValue = "1") int sortCode) {
 
