@@ -280,7 +280,7 @@ public class LikeablePersonServiceTests {
         assertThat(newData.get(0).getId().equals(4L));
         assertThat(newData.get(0).getId().equals(1L));
 
-        assertThat(newData).isSortedAccordingTo(Comparator.comparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing(LikeablePerson::getId, Comparator.reverseOrder()));
     }
 
     @Test
@@ -297,7 +297,7 @@ public class LikeablePersonServiceTests {
         assertThat(newData.get(0).getId().equals(4L));
         assertThat(newData.get(0).getId().equals(5L));
 
-        assertThat(newData).isSortedAccordingTo(Comparator.comparing(LikeablePerson::getModifyDate));
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing(LikeablePerson::getId));
     }
 
     @Test
@@ -314,7 +314,7 @@ public class LikeablePersonServiceTests {
         assertThat(newData.get(0).getId().equals(1L));
         assertThat(newData.get(0).getId().equals(4L));
 
-        assertThat(newData).isSortedAccordingTo(Comparator.comparingInt(e -> -e.getFromInstaMember().getToLikeablePeople().size()));
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing(e -> e.getFromInstaMember().getLikes(), Comparator.reverseOrder()));
     }
 
     @Test
@@ -331,7 +331,7 @@ public class LikeablePersonServiceTests {
         assertThat(newData.get(0).getId().equals(1L));
         assertThat(newData.get(0).getId().equals(5L));
 
-        assertThat(newData).isSortedAccordingTo(Comparator.comparingInt(e -> e.getFromInstaMember().getToLikeablePeople().size()));
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing(e -> e.getFromInstaMember().getLikes()));
     }
 
     @Test
