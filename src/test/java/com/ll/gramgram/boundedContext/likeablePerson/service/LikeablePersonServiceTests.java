@@ -3,6 +3,7 @@ package com.ll.gramgram.boundedContext.likeablePerson.service;
 
 import com.ll.gramgram.TestUt;
 import com.ll.gramgram.base.appConfig.AppConfig;
+import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
@@ -14,10 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -262,5 +265,108 @@ public class LikeablePersonServiceTests {
         assertThat(
                 likeablePersonToBts.getModifyUnlockDate().isAfter(coolTime)
         ).isTrue();
+    }
+
+    @Test
+    @DisplayName("최신순 - 최근에 받은 호감표시를 우선적으로 표시")
+    void t009() {
+        Member memberUser4 = memberService.findByUsername("user4").orElseThrow();
+
+        //최신순으로 정렬
+        RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 1);
+        List<LikeablePerson> newData = result.getData();
+
+        assertThat(newData.get(0).getId()).isEqualTo(5L);
+        assertThat(newData.get(1).getId()).isEqualTo(4L);
+        assertThat(newData.get(2).getId()).isEqualTo(1L);
+
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing(LikeablePerson::getId, Comparator.reverseOrder()));
+    }
+
+    @Test
+    @DisplayName("날짜순 - 오래전에 받은 호감표시를 우선적으로 표시")
+    @Rollback(false)
+    void t010() {
+        Member memberUser4 = memberService.findByUsername("user4").orElseThrow();
+
+        //날짜순으로 정렬
+        RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 2);
+        List<LikeablePerson> newData = result.getData();
+
+        assertThat(newData.get(0).getId()).isEqualTo(1L);
+        assertThat(newData.get(1).getId()).isEqualTo(4L);
+        assertThat(newData.get(2).getId()).isEqualTo(5L);
+
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing(LikeablePerson::getId));
+    }
+
+    @Test
+    @DisplayName("인기 많은 순 - 인기가 많은 호감표시를 우선적으로 표시")
+    @Rollback(false)
+    void t011() {
+        Member memberUser4 = memberService.findByUsername("user4").orElseThrow();
+
+        //인기 많은 순으로 정렬
+        RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 3);
+        List<LikeablePerson> newData = result.getData();
+
+        assertThat(newData.get(0).getId()).isEqualTo(5L);
+        assertThat(newData.get(1).getId()).isEqualTo(4L);
+        assertThat(newData.get(2).getId()).isEqualTo(1L);
+
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing(e -> -e.getFromInstaMember().getLikes()));
+    }
+
+    @Test
+    @DisplayName("인기 적은 순 - 인기가 적은 사람의 호감표시를 우선적으로 표시")
+    @Rollback(false)
+    void t012() {
+        Member memberUser4 = memberService.findByUsername("user4").orElseThrow();
+
+        //인기 적은 순으로 정렬
+        RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 4);
+        List<LikeablePerson> newData = result.getData();
+
+        assertThat(newData.get(0).getId()).isEqualTo(4L);
+        assertThat(newData.get(1).getId()).isEqualTo(1L);
+        assertThat(newData.get(2).getId()).isEqualTo(5L);
+
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing(e -> e.getFromInstaMember().getLikes()));
+    }
+
+    @Test
+    @DisplayName("성별순 - 여성에게 받은 호감표시를 우선으로 표시, 2순위 정렬조건은 최신순")
+    @Rollback(false)
+    void t013() {
+        Member memberUser4 = memberService.findByUsername("user4").orElseThrow();
+
+        //성별순으로 정렬
+        RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 5);
+        List<LikeablePerson> newData = result.getData();
+
+        assertThat(newData.get(0).getId()).isEqualTo(5L);
+        assertThat(newData.get(1).getId()).isEqualTo(1L);
+        assertThat(newData.get(2).getId()).isEqualTo(4L);
+
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing((LikeablePerson e) -> e.getFromInstaMember().getGender().equals("W") ? 0 : 1)
+                .thenComparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
+    }
+
+    @Test
+    @DisplayName("호감사유순 - 외모, 성격, 능력순으로 표시, 2순위 정렬조건으로는 최신순")
+    @Rollback(false)
+    void t014() {
+        Member memberUser4 = memberService.findByUsername("user4").orElseThrow();
+
+        //호감사유순으로 정렬
+        RsData<List<LikeablePerson>> result = likeablePersonService.getLikeablePeople(memberUser4.getInstaMember(), "", 0, 6);
+        List<LikeablePerson> newData = result.getData();
+
+        assertThat(newData.get(0).getId()).isEqualTo(1L);
+        assertThat(newData.get(1).getId()).isEqualTo(4L);
+        assertThat(newData.get(2).getId()).isEqualTo(5L);
+
+        assertThat(newData).isSortedAccordingTo(Comparator.comparing(LikeablePerson::getAttractiveTypeCode)
+                .thenComparing(LikeablePerson::getModifyDate, Comparator.reverseOrder()));
     }
 }

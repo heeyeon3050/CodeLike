@@ -24,6 +24,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -432,5 +433,62 @@ public class LikeablePersonControllerTests {
                 .andExpect(status().is4xxClientError());
 
         assertThat(likeablePersonService.findById(3L).get().getAttractiveTypeCode()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("필터링으로 남성을 조회하면 남성이 호감표시한 리스트들만 출력된다.")
+    @WithUserDetails("user4")
+    void t018() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(get("/usr/likeablePerson/toList")
+                        .param("gender", "M")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("showToList"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(model().attribute("likeablePeople", hasSize(1))); //user4에는 남성 한 명이 호감표시를 하고 있으므로 리스트의 사이즈는 1이다.
+    }
+
+    @Test
+    @DisplayName("필터링으로 여성을 조회하면 여성이 호감표시한 리스트들만 출력된다.")
+    @WithUserDetails("user4")
+    void t019() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(get("/usr/likeablePerson/toList")
+                        .param("gender", "W")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("showToList"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(model().attribute("likeablePeople", hasSize(2))); //user4에는 여성이 두 명이 호감표시를 하고 있으므로 리스트의 사이즈는 1이다.
+    }
+
+    @Test
+    @DisplayName("내가 받은 호감리스트에서 호감사유에 해당하는 리스트들만 출력된다.")
+    @WithUserDetails("user4")
+    void t020() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(get("/usr/likeablePerson/toList")
+                        .param("attractiveTypeCode", "1")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("showToList"))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(model().attribute("likeablePeople", hasSize(1))); //user4에는 호감사유가 외모인 호감표시가 1개 있으므로 리스트의 사이즈는 1이다.
     }
 }

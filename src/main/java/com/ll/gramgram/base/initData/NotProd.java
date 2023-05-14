@@ -64,6 +64,10 @@ public class NotProd {
                 Ut.reflection.setFieldValue(likeablePersonToInstaUser100, "modifyUnlockDate", LocalDateTime.now().minusSeconds(1));
 
                 LikeablePerson likeablePersonToInstaUserAbcd = likeablePersonService.like(memberUser3, "insta_user_abcd", 2).getData();
+
+                likeablePersonService.like(memberUser2, "insta_user4", 2).getData();
+                likeablePersonService.like(memberUser5, "insta_user4", 3).getData();
+                likeablePersonService.like(memberUser2, "insta_user5", 1).getData();
             }
         };
     }
