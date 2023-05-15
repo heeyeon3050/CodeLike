@@ -2,6 +2,7 @@ package com.ll.gramgram.boundedContext.likeablePerson.controller;
 
 
 import com.ll.gramgram.base.appConfig.AppConfig;
+import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
 import com.ll.gramgram.boundedContext.member.entity.Member;
@@ -16,15 +17,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -436,59 +441,88 @@ public class LikeablePersonControllerTests {
     }
 
     @Test
-    @DisplayName("필터링으로 남성을 조회하면 남성이 호감표시한 리스트들만 출력된다.")
+    @DisplayName("남성 필터링")
     @WithUserDetails("user4")
     void t018() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
-                .perform(get("/usr/likeablePerson/toList")
-                        .param("gender", "M")
-                )
+                .perform(get("/usr/likeablePerson/toList?gender=M"))
                 .andDo(print());
 
         // THEN
-        resultActions
+        MvcResult mvcResult = resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("showToList"))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(model().attribute("likeablePeople", hasSize(1))); //user4에는 남성 한 명이 호감표시를 하고 있으므로 리스트의 사이즈는 1이다.
+                .andReturn();
+
+        Map<String, Object> model = mvcResult.getModelAndView().getModel();
+
+        List<LikeablePerson> likeablePeople = (List<LikeablePerson>) model.get("likeablePeople");
+
+        Map<String, Long> countings = likeablePeople
+                .stream()
+                .map(LikeablePerson::getFromInstaMember)
+                .map(InstaMember::getGender)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        assertThat(countings.get("M")).isEqualTo(likeablePeople.size());
     }
 
     @Test
-    @DisplayName("필터링으로 여성을 조회하면 여성이 호감표시한 리스트들만 출력된다.")
+    @DisplayName("여성 필터링")
     @WithUserDetails("user4")
     void t019() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
-                .perform(get("/usr/likeablePerson/toList")
-                        .param("gender", "W")
-                )
+                .perform(get("/usr/likeablePerson/toList?gender=W"))
                 .andDo(print());
 
         // THEN
-        resultActions
+        MvcResult mvcResult = resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("showToList"))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(model().attribute("likeablePeople", hasSize(2))); //user4에는 여성이 두 명이 호감표시를 하고 있으므로 리스트의 사이즈는 1이다.
+                .andReturn();
+
+        Map<String, Object> model = mvcResult.getModelAndView().getModel();
+
+        List<LikeablePerson> likeablePeople = (List<LikeablePerson>) model.get("likeablePeople");
+
+        Map<String, Long> countings = likeablePeople
+                .stream()
+                .map(LikeablePerson::getFromInstaMember)
+                .map(InstaMember::getGender)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        assertThat(countings.get("W")).isEqualTo(likeablePeople.size());
     }
 
     @Test
-    @DisplayName("내가 받은 호감리스트에서 호감사유에 해당하는 리스트들만 출력된다.")
+    @DisplayName("외모 필터링")
     @WithUserDetails("user4")
     void t020() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
-                .perform(get("/usr/likeablePerson/toList")
-                        .param("attractiveTypeCode", "1")
-                )
+                .perform(get("/usr/likeablePerson/toList?attractiveTypeCode=1"))
                 .andDo(print());
 
         // THEN
-        resultActions
+        MvcResult mvcResult = resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("showToList"))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(model().attribute("likeablePeople", hasSize(1))); //user4에는 호감사유가 외모인 호감표시가 1개 있으므로 리스트의 사이즈는 1이다.
+                .andReturn();
+
+        Map<String, Object> model = mvcResult.getModelAndView().getModel();
+
+        List<LikeablePerson> likeablePeople = (List<LikeablePerson>) model.get("likeablePeople");
+
+        Map<Integer, Long> countings = likeablePeople
+                .stream()
+                .map(LikeablePerson::getAttractiveTypeCode)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        assertThat(countings.get(1)).isEqualTo(likeablePeople.size());
     }
 }

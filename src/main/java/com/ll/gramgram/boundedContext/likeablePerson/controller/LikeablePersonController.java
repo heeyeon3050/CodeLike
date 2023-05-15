@@ -10,14 +10,13 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/usr/likeablePerson")
@@ -124,15 +123,24 @@ public class LikeablePersonController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/toList")
-    public String showToList(Model model, @RequestParam(defaultValue = "") String gender,
-                             @RequestParam(defaultValue = "0") int attractiveTypeCode,
-                             @RequestParam(defaultValue = "1") int sortCode) {
-
+    public String showToList(Model model, ToListForm toListForm) {
         InstaMember instaMember = rq.getMember().getInstaMember();
 
-        RsData<List<LikeablePerson>> likeablePeople = likeablePersonService.getLikeablePeople(instaMember, gender, attractiveTypeCode, sortCode);
-        model.addAttribute("likeablePeople", likeablePeople.getData());
+        // 인스타인증을 했는지 체크
+        if (instaMember != null) {
+            // 해당 인스타회원이 좋아하는 사람들 목록
+            List<LikeablePerson> likeablePeople = likeablePersonService.findByToInstaMember(instaMember, toListForm.gender, toListForm.attractiveTypeCode, toListForm.sortCode);
+
+            model.addAttribute("likeablePeople", likeablePeople);
+        }
 
         return "usr/likeablePerson/toList";
+    }
+
+    @Setter
+    public static class ToListForm {
+        private String gender = "";
+        private int attractiveTypeCode = 0;
+        private int sortCode = 1;
     }
 }
