@@ -1,27 +1,36 @@
 # CodeLike
 인스타 아이디를 기반의 익명 호감 표시 서비스
+- 본인의 인스타 아이디를 입력하면, 현재 자신에게 호감을 느끼고 있는 사람이 몇 명인지 알 수 있다.
+- 나를 좋아하는 상대방이 나의 어떤 매력포인트 때문에 좋아하는지 알 수 있다.
+- 나를 좋아하는 상대방의 성별도 알 수 있다.
 
 <br>
 
 ## 주요기능
 - Auoth2를 이용한 로그인 기능
-- 호감 표시 기능
+        - 카카오 로그인
+        - 네이버 로그인
+        - 구글 로그인
+        - 페이스북 로그인
+- 호감 표시, 수정, 삭제 기능
+        - 5명까지 호감 표시 가능
+        - 호감 사유 선택(외모, 성격, 능력)
+        - 최근 수정한 시간으로부터 3시간 이후에 수정 및 삭제 가능
 - 호감 확인 기능
+        - 나를 좋아하는 사람의 수 확인
+        - 나를 외모때문에 좋아하는 사람의 수 확인
+        - 나를 성격때문에 좋아하는 사람의 수 확인
+        - 나를 능력때문에 좋아하는 사람의 수 확인
 - 알림 기능
-
+        - 나를 호감 표시한 내역이 있으면 알림
+        - 읽지 않은 내용은 🔥표시. 읽으면 사라짐
 <br>
 
 ## 배포 링크
 
-<a href="https://ouo.ac/">코드라이크 배포 링크</a>
+<a href="https://www.ouo.ac/">코드라이크 배포 링크</a>
 
 ## 기술스택
-![image](https://github.com/heeyeon3050/HiddenHearts/assets/111184269/c8365c3b-3b0c-4f0c-8f5d-63e1b3d131bf)
-![image](https://github.com/heeyeon3050/HiddenHearts/assets/111184269/145629fc-3875-47dc-8a34-a4da78ef3432)
-![image](https://github.com/heeyeon3050/HiddenHearts/assets/111184269/765708b4-e25c-41ee-b80d-2477d521d416)
-![image](https://github.com/heeyeon3050/HiddenHearts/assets/111184269/910d15be-e088-476a-9b56-966bf026d239)
-![image](https://github.com/heeyeon3050/HiddenHearts/assets/111184269/a8212f0c-d506-4691-bafa-79f8fba3c827)
-
 
 ### Tech
 <img src="https://img.shields.io/badge/Java-FC4C02?style=flat-square&logo=java&logoColor=white"/> <img src="https://img.shields.io/badge/Spring boot-6DB33F?style=flat-square&logo=Spring boot&logoColor=white"/>
@@ -46,9 +55,6 @@
 
 <br><br>
 
-## 요구사항 분석
-
-
 
 ## 프로젝트 실행 방법
 
@@ -57,32 +63,44 @@
 2. src/main/resources 에 application-secret.yml 작성한다.
 ```yml
 spring:
-  datasource:
-    url: jdbc:mariadb://DB주소:포트번호/DB명?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
-    driver-class-name: org.mariadb.jdbc.Driver
-    username: 계정이름
-    password: 비밀번호
-
-  jpa:
-    hibernate:
-      ddl-auto: create
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        use_sql_comments: true
-
   security:
     oauth2:
       client:
         registration:
           naver:
-            clientId: '네이버에서 발급받은 id'
-            client-secret: '네이버에서 발급받은 시크릿 키'
+            clientId: 'CLIENT ID'
+            client-secret: 'CLIENT PASSWORD'
           kakao:
-            clientId: '카카오에서 발급받은 키'
-    s3:
-      endpoint: https://kr.object.ncloudstorage.com
-      bucket: '버킷명'
-      dir: '버킷안에서 사용할 디렉토리명'
+            clientId: 'CLIENT ID'
+          google:
+            clientId: 'CLIENT ID'
+            client-secret: 'CLIENT PASSWORD'
+          facebook:
+            clientId: 'CLIENT ID'
+            client-secret: 'CLIENT PASSWORD'
+          instagram:
+            clientId: 'CLIENT ID'
+            client-secret: 'CLIENT PASSWORD'
+custom:
+  security:
+    oauth2:
+      client:
+        registration:
+          naver:
+            devUserOauthId: 'oauthId'
+          kakao:
+            devUserOauthId: 'oauthId'
+          google:
+            devUserOauthId: 'oauthId'
+          facebook:
+            devUserOauthId: 'oauthId'
 ```
+
+<br><br>
+
+## 화면 구성
+![image](https://github.com/heeyeon3050/HiddenHearts/assets/111184269/7341de64-1eb0-455c-864f-8c0b97579b85)
+![image](https://github.com/heeyeon3050/HiddenHearts/assets/111184269/8f27a7d2-df3b-4ab5-9113-7994386df8e4)
+![image](https://github.com/heeyeon3050/HiddenHearts/assets/111184269/c27f15b3-d8df-443f-b9a9-1e60d475ddd9)
+![image](https://github.com/heeyeon3050/HiddenHearts/assets/111184269/61f5f1c3-808f-4407-a803-b0bcd582266c)
+![image](https://github.com/heeyeon3050/HiddenHearts/assets/111184269/649bbba0-3282-4c75-beef-5d8af5a5b5fc)
